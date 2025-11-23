@@ -280,11 +280,15 @@ footer {
   padding-bottom: 1rem;
 }
 
-footer p {
+footer a {
   color: var(--bright);
   font-size: 0.9rem;
   text-align: center;
   margin: 0;
+}
+
+footer a:hover {
+  color: var(--accent-shade);
 }
 
 @media (max-width: 768px) {

@@ -99,7 +99,7 @@ function App() {
         </div>
       </section>
       
-      <section className="code-section boarders">
+      <section className="code-section boarders" id="tool">
         {/* THE CODE SECTION - Only shows if uploadedCode is not null */}
         {uploadedCode && (
           <div className="container">
@@ -131,7 +131,7 @@ function App() {
       </section>
       
       <footer className="boarders">
-        <p>{text.copyrights}</p>
+        <a href="mailto:taimkellizy@gmail.com">{text.copyrights}</a>
       </footer>
     </div>
   );
