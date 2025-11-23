@@ -1,0 +1,39 @@
+.code-window {
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 800px;
+  margin: 2rem auto;
+  overflow: hidden;
+  border: 1px solid #333;
+  direction: ltr; 
+  text-align: left;
+}
+
+.window-header {
+  background-color: #252526;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #1e1e1e;
+  position: relative;
+}
+
+.filename {
+  color: #ffffff !important;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  z-index: 10;
+}
+
+.window-body {
+  background-color: #1e1e1e;
+}
+
+.code-section {
+  padding: 2rem 0;
+  animation: fadeIn 0.5s ease forwards;
+}

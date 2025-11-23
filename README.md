@@ -42,12 +42,12 @@ Make sure you have **Node.js** installed.
 
 1.  **Clone the repository**
     ```bash
-    git clone [https://github.com/Taimkellizy/ArabifyByTaimKellizy.git](https://github.com/Taimkellizy/ArabifyByTaimKellizy.git)
+    git clone https://github.com/Taimkellizy/ArabifyByTaimKellizy.git
     ```
 
 2.  **Navigate to the project folder**
     ```bash
-    cd ArabifyByTaimKellizy
+    cd arabifybytaimkellizy
     ```
 
 3.  **Install dependencies** (Important!)

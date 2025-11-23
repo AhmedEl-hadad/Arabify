@@ -7,7 +7,9 @@ export const content = {
     heropar: "Instant scans for RTL, AR-SEO, fonts, and accessibility. Fix hints + live preview.",
     herobtn1: "Try Now",
     herobtn2: "View Source",
-    copyrights: "© 2025 Arabify. All rights reserved."
+    copyrights: "© 2025 Arabify. All rights reserved.",
+    upFile: "Upload File",
+    fileUped: "File Uploaded (Change?)"
   },
   ar: {
     blog: "مدونة",
@@ -17,6 +19,8 @@ export const content = {
     heropar: "فحوصات فورية لمحركات البحث، الخطوط، وسهولة الوصول. نصائح للإصلاح + معاينة مباشرة.",
     herobtn1: "جرب فحص سريع",
     herobtn2: "عرض المصدر",
-    copyrights: "© 2025 عَرِّب. جميع الحقوق محفوظة."
+    copyrights: "© 2025 عَرِّب. جميع الحقوق محفوظة.",
+    upFile: "رفع ملف",
+    fileUped: "تم رفع الملف (تغيير؟)"
   }
 };

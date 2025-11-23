@@ -19,6 +19,7 @@
     "react-bits": "^1.0.5",
     "react-dom": "^19.2.0",
     "react-scripts": "^5.0.1",
+    "react-syntax-highlighter": "^16.1.0",
     "three": "^0.181.2",
     "web-vitals": "^2.1.4"
   },

@@ -2,8 +2,9 @@ import './App.css';
 import { useState, useEffect } from 'react';
 import { content } from './content';
 import SplitText from './split_text.js';
+import CodeWindow from './CodeWindow';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faAddressBook, faPen, faGlobe, faCode} from '@fortawesome/free-solid-svg-icons';
+import {faAddressBook, faPen, faGlobe, faCode, faCheck, faUpload} from '@fortawesome/free-solid-svg-icons';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 
 function App() {
@@ -28,8 +29,24 @@ function App() {
 
   // Helper to get current text
   const text = content[lang];
-  const handleAnimationComplete = () => {console.log("animation finished");};
 
+  // New State for the uploaded code
+  const [uploadedCode, setUploadedCode] = useState(null); 
+  const [fileName, setFileName] = useState("");
+
+  // File Upload Logic
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setFileName(file.name); // Update the name
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setUploadedCode(event.target.result); // Update the code
+    };
+    reader.readAsText(file);
+  };
 
   return (
     <div className="App">
@@ -43,7 +60,7 @@ function App() {
               </a>
             </li>
 
-            {/* LINKS (Using the text variable) */}
+            {/* LINKS */}
             <li>
               <a href="#tools">
                 <FontAwesomeIcon icon={faPen} className='icons-end' /> {text.blog}
@@ -76,11 +93,45 @@ function App() {
         <div className="hero-content">
           <p className="hero-desc">{text.heropar}</p>
           <div className="btn-group">
-            <a className="btn">{text.herobtn1}<FontAwesomeIcon icon={faCode} className="icons-start" href="#tool" /></a>
+            <a className="btn" href="#tool">{text.herobtn1}<FontAwesomeIcon icon={faCode} className="icons-start" /></a>
             <a className="btn" href="https://github.com/Taimkellizy/ArabifyByTaimKellizy">{text.herobtn2}<FontAwesomeIcon icon={faGithub} className="icons-start" /></a>
           </div>
         </div>
       </section>
+      <section className="code-section boarders" id="tool">
+        
+        {/* THE UPLOAD BUTTON */}
+        <div>
+          <input 
+            type="file" 
+            id="file-upload" 
+            onChange={handleFileUpload} 
+            style={{ display: 'none' }} 
+          />
+          <label htmlFor="file-upload" className="btn">
+             {/* LOGIC: Change Text/Icon based on state */}
+             <FontAwesomeIcon 
+                icon={uploadedCode ? faCheck : faUpload} 
+                className="icons-end" 
+             />
+             {uploadedCode ? text.fileUped : text.upFile}
+          </label>
+        </div>
+      </section>
+
+      {/* THE CODE SECTION - Only shows if uploadedCode is not null */}
+      {uploadedCode && (
+        <section className="code-section boarders">
+          <div className="container">
+             {/* We force the filename here to ensure it passes down */}
+             <CodeWindow 
+               code={uploadedCode} 
+               fileName={fileName} 
+               language="javascript" 
+             />
+          </div>
+        </section>
+      )}
       <footer className="boarders">
         <p>{text.copyrights}</p>
       </footer>
