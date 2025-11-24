@@ -55,8 +55,8 @@ body {
 }
 
 .boarders {
-  border-left: var(--border-width) solid var(--border-color);
-  border-right: var(--border-width) solid var(--border-color);
+  border-inline-start: var(--border-width) solid var(--border-color);
+  border-inline-end: var(--border-width) solid var(--border-color);
 }
 
 header {
@@ -291,6 +291,18 @@ footer a:hover {
   color: var(--accent-shade);
 }
 
+.analyse-btn {
+  display: flex;
+  justify-content: center;
+  gap : 1rem;
+}
+
+.results-section{
+  color: var(--accent-shade);
+  padding-top: 1rem;
+  padding-inline: 3rem;
+}
+
 @media (max-width: 768px) {
   .App {
     padding: 0; /* Use full width on mobile */
@@ -306,7 +318,7 @@ footer a:hover {
   }
 
   nav .logo-item {
-    margin-right: 0;
+    margin-inline-end: 0;
     display: flex;
     width: 100%;
     justify-content: center;

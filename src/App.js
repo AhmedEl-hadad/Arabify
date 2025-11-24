@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { content } from './content';
 import SplitText from './split_text.js';
 import CodeWindow from './CodeWindow';
+import analyzeHTML from './analyzeHTML.js';
+import analyzeCSS from './analyzeCSS.js';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faAddressBook, faPen, faGlobe, faCode, faCheck, faUpload} from '@fortawesome/free-solid-svg-icons';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
@@ -34,18 +36,68 @@ function App() {
   const [uploadedCode, setUploadedCode] = useState(null); 
   const [fileName, setFileName] = useState("");
 
+  const [fileType, setFileType] = useState(null); // 'html' or 'css'
+  const [warnings, setWarnings] = useState([]);
+  const [score, setScore] = useState(null);
+  const [downloadableCode, setDownloadableCode] = useState(null);
+
   // File Upload Logic
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    setFileName(file.name); // Update the name
+    setFileName(file.name);
+    
+    // --- DETECT FILE TYPE ---
+    if (file.name.endsWith('.css')) {
+      setFileType('css');
+    } else if (file.name.endsWith('.html') || file.name.endsWith('.jsx') || file.name.endsWith('.js')) {
+      setFileType('html');
+    } else {
+      setFileType('unknown');
+    }
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      setUploadedCode(event.target.result); // Update the code
+      setUploadedCode(event.target.result);
+      // Reset previous results when new file is uploaded
+      setScore(null);
+      setWarnings([]);
+      setDownloadableCode(null);
     };
     reader.readAsText(file);
+  };
+
+  const handleAnalysis = () => {
+    if (fileType === 'html') {
+      const { score, warnings } = analyzeHTML(uploadedCode, text);
+      setWarnings(warnings);
+      setScore(score);
+      // You can't easily auto-fix HTML structure logic safely, 
+      // so just show warnings for HTML.
+    } 
+    else if (fileType === 'css') {
+      const { score, warnings, fixedCSS } = analyzeCSS(uploadedCode, text);
+      setScore(score);
+      setWarnings(warnings);
+      // Save the fixed code to state so the user can download it
+      setDownloadableCode(fixedCSS); 
+    }
+  };
+
+  const downloadFile = (content, filename) => {
+    // Create a "Blob" (Binary Large Object) from your string
+    const element = document.createElement("a");
+    const file = new Blob([content], {type: 'text/plain'});
+    
+    // Create a fake URL for that blob
+    element.href = URL.createObjectURL(file);
+    element.download = "fixed-" + filename;
+    
+    // Fake a click to trigger download
+    document.body.appendChild(element); // Required for FireFox
+    element.click();
+    document.body.removeChild(element);
   };
 
   return (
@@ -129,6 +181,33 @@ function App() {
           </label>
         </div>
       </section>
+
+      {uploadedCode && (
+        <div className='boarders analyse-btn'>
+    
+          {/* THE ANALYZE BUTTON */}
+          <button onClick={handleAnalysis} className="btn">
+            Analyze Code
+          </button>
+
+          {/* THE DOWNLOAD BUTTON (Only shows if fixed code exists) */}
+          {downloadableCode && (
+            <button onClick={() => downloadFile(downloadableCode, fileName)} className="btn">
+                Download Fix
+            </button>
+          )}
+        </div>
+      )}
+      {score !== null && (
+        <div className='boarders results-section'>
+          <h3>{text.score} {score}/100</h3>
+          <ul>
+            {warnings.map((warn, index) => (
+              <li key={index}>{warn.msg}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       
       <footer className="boarders">
         <a href="mailto:taimkellizy@gmail.com">{text.copyrights}</a>

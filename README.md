@@ -68,6 +68,8 @@ The app will automatically open in your browser at `http://localhost:3000`.
 src/
 ├── App.js          # Main application logic & Language state
 ├── App.css         # Global styles & Responsive rules
+├── analyzeCSS.js   # Algorithm for processing the CSS
+├── analyzeHTML.js  # ALgorithm for processing the HTML
 ├── CodeWindow.css  # Styles for CodeWindow.js
 ├── CodeWindow.js   # Custom component for code preview
 ├── content.js      # Dictionary for English/Arabic text
