@@ -63,12 +63,17 @@ const analyzeHTML = (htmlString, text) => {
     warnings.push({ type: text.errtypeLanguage, msg: text.msgMissingLangAttribute });
   }
 
+  if (!htmlTag.hasAttribute("dir")) {
+    score -= 5;
+    warnings.push({ type: text.errtypeLanguage, msg: text.msgMissingDirAttribute });
+  }
+
   // Check Images for Alt
   const images = doc.querySelectorAll("img");
   images.forEach((img, index) => {
     // Check if alt is missing OR empty (alt="") is valid, but missing is bad
     if (!img.hasAttribute("alt")) {
-      score -= 10;
+      score -= 5;
       
       let rawMessage = text.msgMissingAlt;
       let finalMessage = rawMessage.replace("{id}", index + 1);

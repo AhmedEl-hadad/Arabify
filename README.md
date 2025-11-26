@@ -15,7 +15,7 @@ Upload your HTML/CSS → click **Scan** → get a score + issues → download fi
   - Semantic Tags => header, nav, footer — (-20 points each -60 points max)
   - SEO => meta tags — (-5 points each -25 points max)
   - Accessibility => alt attribute — (-10 pints once)
-  - Language => lang attribute — (-5 points once)
+  - Language => lang, dir attributes — (-5 points each once)
 - 
 
 - Categoreis & weights for CSS:
