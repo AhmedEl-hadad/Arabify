@@ -46,17 +46,21 @@ body {
 }
 
 .App {
-  width: 100%;
-  max-width: 1400px; 
-  margin: 0 auto;    
-  padding: 0 5%;
+  width: 80%; 
+  max-width: 1400px;
+  margin: 0 auto;
+  border-left: var(--border-width) solid var(--border-color);
+  border-right: var(--border-width) solid var(--border-color);
   min-height: 100vh;
-  position: relative;     
+  box-sizing: border-box;
+  position: relative;
 }
 
-.boarders {
-  border-inline-start: var(--border-width) solid var(--border-color);
-  border-inline-end: var(--border-width) solid var(--border-color);
+header, section, footer {
+  width: 100%;
+  padding-left: 5%; 
+  padding-right: 5%;
+  box-sizing: border-box; 
 }
 
 header {
