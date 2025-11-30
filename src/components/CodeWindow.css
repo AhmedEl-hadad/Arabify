@@ -79,10 +79,8 @@
   left: 0;
   width: 100%;
   height: 80px;
-  /* How tall the fade is */
   background: linear-gradient(to bottom, rgba(30, 30, 30, 0), #1e1e1e);
   pointer-events: none;
-  /* Lets clicks pass through if needed */
   z-index: 5;
 }
 
@@ -105,7 +103,6 @@
 
 .code-footer-btn:hover {
   background-color: #0063a5;
-  /* Darker blue on hover */
 }
 
 .code-window code,

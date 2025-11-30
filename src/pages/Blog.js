@@ -27,7 +27,7 @@ const Blog = ({ text, lang }) => {
   }, [hash]);
 
   return (
-    // 1. Use 'blog-container' class
+    // Use 'blog-container' class
     <div className="boarders blog-container">
 
       {/* Page Header */}

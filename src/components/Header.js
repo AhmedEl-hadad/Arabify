@@ -1,7 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAddressBook, faPen, faGlobe } from '@fortawesome/free-solid-svg-icons';
-// Make sure to import Link from router so the page doesn't refresh
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
 
 const Header = ({ text, toggleLanguage }) => {
   return (
@@ -33,7 +32,7 @@ const Header = ({ text, toggleLanguage }) => {
           {/* TOGGLE BUTTON */}
           <li>
             <button onClick={toggleLanguage} className="lang-btn">
-              <FontAwesomeIcon icon={faGlobe} className='icons-end' /> 
+              <FontAwesomeIcon icon={faGlobe} className='icons-end' />
               {text.toggleBtn}
             </button>
           </li>

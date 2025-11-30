@@ -51,14 +51,14 @@ const analyzeCSS = (cssString, text) => {
   autoFix(/text-align:\s*left/g, "text-align: start", text.fixTextAlign, 8);
   autoFix(/text-align:\s*right/g, "text-align: end", text.fixTextAlign, 8);
 
-  // 1. Specific Corners (Physical -> Logical)
+  // Specific Corners (Physical -> Logical)
   // This converts "border-top-left-radius" to "border-start-start-radius" so it flips automatically.
   autoFix(/border-top-left-radius/g, "border-start-start-radius", "Fixed top-left radius to logical start-start", 3);
   autoFix(/border-top-right-radius/g, "border-start-end-radius", "Fixed top-right radius to logical start-end", 3);
   autoFix(/border-bottom-right-radius/g, "border-end-end-radius", "Fixed bottom-right radius to logical end-end", 3);
   autoFix(/border-bottom-left-radius/g, "border-end-start-radius", "Fixed bottom-left radius to logical end-start", 3);
 
-  // 2. Shorthand Explosion (The Magic Fix for inputs & buttons)
+  // Shorthand Explosion (The Magic Fix for inputs & buttons)
   // This catches "border-radius: 8px 0 0 8px;" and explodes it into 4 logical lines.
   // We use a callback function as the replacement to capture the 4 values (tl, tr, br, bl).
   autoFix(
@@ -73,6 +73,25 @@ const analyzeCSS = (cssString, text) => {
     },
     "Converted physical border-radius shorthand to logical properties",
     3
+  );
+
+  // --- POSITIONING FIXES (For Images) ---
+
+  // Fix "left: 10px;" -> "inset-inline-start: 10px;"
+  // The regex (^|\s|;) ensures we don't accidentally match "margin-left" again.
+  autoFix(
+    /(^|[\s;])left:\s*([^;]+);/g,
+    "$1inset-inline-start: $2;",
+    "Fixed absolute positioning 'left' to 'inset-inline-start'",
+    5
+  );
+
+  // Fix "right: 0;" -> "inset-inline-end: 0;"
+  autoFix(
+    /(^|[\s;])right:\s*([^;]+);/g,
+    "$1inset-inline-end: $2;",
+    "Fixed absolute positioning 'right' to 'inset-inline-end'",
+    5
   );
 
 
