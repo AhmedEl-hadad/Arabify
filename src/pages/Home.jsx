@@ -3,9 +3,8 @@ import SplitText from "../components/split_text";
 import CodeWindow from "../components/CodeWindow";
 import analyzeHTML from "../components/analyzeHTML";
 import analyzeCSS from "../components/analyzeCSS";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faUpload, faCode } from "@fortawesome/free-solid-svg-icons";
-import { faGithub } from "@fortawesome/free-brands-svg-icons";
+import { FaCheck, FaCode, FaUpload } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 import Confetti from "react-confetti";
 import { Link } from "react-router-dom";
 
@@ -33,7 +32,7 @@ const Home = ({ text, lang }) => {
     } else if (
       file.name.endsWith(".html") ||
       file.name.endsWith(".jsx") ||
-      file.name.endsWith(".js")
+      file.name.endsWith(".jsx")
     ) {
       setFileType("html");
     } else {
@@ -106,14 +105,14 @@ const Home = ({ text, lang }) => {
             <div className="btn-group">
               <a className="btn" href="#tool">
                 {text.herobtn1}
-                <FontAwesomeIcon icon={faCode} className="icons-start" />
+                <FaCode className="icons-start" />
               </a>
               <a
                 className="btn"
                 href="https://github.com/Taimkellizy/ArabifyByTaimKellizy"
               >
                 {text.herobtn2}
-                <FontAwesomeIcon icon={faGithub} className="icons-start" />
+                <FaGithub className="icons-start" />
               </a>
             </div>
           </div>
@@ -142,8 +141,8 @@ const Home = ({ text, lang }) => {
             />
             <label htmlFor="file-upload" className="btn">
               {/* LOGIC: Change Text/Icon based on state */}
-              <FontAwesomeIcon
-                icon={uploadedCode ? faCheck : faUpload}
+              <FaCheck
+                icon={uploadedCode ? FaCheck : FaUpload}
                 className="icons-end"
               />
               {uploadedCode ? text.fileUped : text.upFile}

@@ -1,11 +1,10 @@
-import CodeWindow from '../components/CodeWindow';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faYoutube } from '@fortawesome/free-brands-svg-icons';
-import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import CodeWindow from "../components/CodeWindow";
+import { FaYoutube } from "react-icons/fa";
+import React, { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const Blog = ({ text, lang }) => {
-  const isAr = lang === 'ar';
+  const isAr = lang === "ar";
 
   // --- NEW: Scroll to Hash Logic ---
   const { hash } = useLocation();
@@ -15,12 +14,14 @@ const Blog = ({ text, lang }) => {
     if (hash) {
       // Small timeout ensures the DOM is fully loaded before scrolling
       setTimeout(() => {
-        const element = document.getElementById(hash.replace('#', ''));
+        const element = document.getElementById(hash.replace("#", ""));
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
+          element.scrollIntoView({ behavior: "smooth" });
           // Optional: Add a "highlight" effect
           element.style.backgroundColor = "rgba(255, 255, 255, 0.05)";
-          setTimeout(() => { element.style.backgroundColor = "transparent"; }, 2000);
+          setTimeout(() => {
+            element.style.backgroundColor = "transparent";
+          }, 2000);
         }
       }, 100);
     }
@@ -29,7 +30,6 @@ const Blog = ({ text, lang }) => {
   return (
     // Use 'blog-container' class
     <div className="boarders blog-container">
-
       {/* Page Header */}
       <div className="blog-header">
         <h1 className="blog-title">{text.blog}</h1>
@@ -39,8 +39,11 @@ const Blog = ({ text, lang }) => {
       {/* Blog Posts Loop */}
       <div className="blog-grid">
         {text.blogPosts.map((post) => (
-          <article key={post.id} id={`post-${post.id}`} className="blog-article">
-
+          <article
+            key={post.id}
+            id={`post-${post.id}`}
+            className="blog-article"
+          >
             <h2 className="article-title">{post.title}</h2>
             <p className="article-desc">{post.desc}</p>
 
@@ -51,7 +54,7 @@ const Blog = ({ text, lang }) => {
             </div>
 
             {/* Code Window */}
-            <div style={{ marginBottom: '1.5rem' }}>
+            <div style={{ marginBottom: "1.5rem" }}>
               <CodeWindow
                 code={post.code}
                 fileName={isAr ? "مثال.css" : "Example.css"}
@@ -67,10 +70,12 @@ const Blog = ({ text, lang }) => {
                 rel="noreferrer"
                 className="btn video-btn"
               >
-                <FontAwesomeIcon icon={faYoutube} style={{ color: '#ff0033' }} />
+                <FaYoutube style={{ color: "#ff0033" }} />
 
                 {/* Text */}
-                <span>{text.videoWatch} {post.videoTitle}</span>
+                <span>
+                  {text.videoWatch} {post.videoTitle}
+                </span>
               </a>
             )}
 

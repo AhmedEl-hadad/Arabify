@@ -1,15 +1,15 @@
 import "./App.css";
 import { useState, useEffect } from "react";
-import { content } from "./content";
+import { content } from "./content.jsx";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 // Import Components
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+import Header from "./components/Header.jsx";
+import Footer from "./components/Footer.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
 
 // Import Pages
-import Home from "./pages/Home";
-import Blog from "./pages/Blog";
+import Home from "./pages/Home.jsx";
+import Blog from "./pages/Blog.jsx";
 
 function App() {
   // Initialize state (check localStorage so it remembers the choice on refresh)
