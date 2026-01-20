@@ -181,7 +181,7 @@ const getJSXName = (node) => {
 
 const checkClassName = (className, warnings, text) => {
     if (!className) return;
-    const badClasses = ['left-', 'right-', 'ml-', 'mr-', 'pl-', 'pr-'];
+
     // This is a loose check, might match "bright-color" which is false positive.
     // Better to check for word boundaries or specific tailwind classes
     // For now, let's look for "text-left", "text-right", "float-left", "float-right"
