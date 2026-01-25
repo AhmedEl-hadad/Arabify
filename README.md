@@ -1,124 +1,154 @@
-# 🌐 Arabify (عَرِّب) v0.2.0
+<a name="top"></a>
+[![Arabify Banner](assets/Arabify-banner.png)](https://arabify-by-taim-kellizy.vercel.app)
 
-**Arabify** scans HTML & CSS files and scores how well a page is “Arabified”. It checks AR-SEO signals, RTL layout, accessibility (alt, labels, ARIA), and basic performance heuristics — then returns a 0–100 score, a categorized breakdown, copyable fixes, and a patched preview (Only for CSS). All processing runs client-side (no server, free, hackathon-ready).
+<!-- Badges -->
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/Taimkellizy/ArabifyByTaimKellizy)
+[![React](https://img.shields.io/badge/react-%2320232a.svg?style=flat&logo=react&logoColor=%2361DAFB)](https://react.dev/)
+[![Vercel](https://img.shields.io/badge/vercel-%23000000.svg?style=flat&logo=vercel&logoColor=white)](https://arabify-by-taim-kellizy.vercel.app)
 
-## 🎉 New Features in v0.2.0
-- **Robust Testing Suite**: Added comprehensive unit tests for CSS, HTML, and JSX analyzers to ensure reliability and regression protection.
+**Arabify (عَرِّب)** scans HTML & CSS files and scores how well a page is “Arabified”. It checks AR-SEO signals, RTL layout, accessibility (alt, labels, ARIA), and basic performance heuristics — then returns a 0–100 score, a categorized breakdown, copyable fixes, and a patched preview (Only for CSS). All processing runs client-side.
+
+<!-- Social Share -->
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=social&logo=linkedin)](https://www.linkedin.com/in/taimkellizy/)
+
+---
+
+## Table of Contents
+- [About](#-about)
+- [What's New](#-whats-new)
+- [Scoring Model](#-scoring-model)
+- [How it works](#-how-to-works)
+- [Limitations](#-limitations)
+- [Online Demo](#-online-demo)
+- [How to Build](#-how-to-build)
+- [Project Structure](#-project-structure)
+- [License](#-license)
+- [Contacts](#-contacts)
+
+## 🚀 About
+
+**Arabify** is designed to help developers ensure their web pages are fully optimized for Arabic users. It goes beyond simple RTL checks by analyzing deep architectural patterns in your HTML and CSS.
+
+### 🛠️ Tech stack
+- **Frontend**: Plain React with components from [**React Bits**](https://reactbits.dev), [**GSAP**](https://gsap.com), and icons from [**FontAwesome**](https://fontawesome.com/).
+- **CSS Processing**: [**PostCSS**](https://postcss.org/) for robust parsing and analysis of CSS files.
+- **Syntax Highlighting**: [**react-syntax-highlighter**](https://github.com/react-syntax-highlighter/react-syntax-highlighter) (Prism) for code previews.
+- **No server required**: Runs entirely in the browser (MVP).
+
+## ✨ What's New
+
+### Version 0.2.0
+
+> [!NOTE]
+> This release brings full support for React components and comprehensive testing!
+
+#### ⚡ Key Features
+- **Robust Testing Suite**: Added comprehensive unit tests for CSS, HTML, and JSX analyzers to ensure reliability.
 - **JSX/TSX Support**: Now supports analyzing React components (`.jsx`, `.tsx`, `.js`) directly!
-- **Enhanced RTL Analysis**:
-  - Detects physical properties in JS style objects (e.g., `marginLeft`, `paddingRight`).
-  - Identifies direction-sensitive `borderRadius` shorthands (4 values).
-  - Checks for hardcoded `textAlign` and `float` values, including TypeScript `as const`.
-  - Flags physical margin/padding utility classes (e.g., `ml-4`, `pr-2`).
 - **Full Arabic Localization**: The entire interface and all error messages are now fully translated into Arabic.
-- **Enhanced Analysis**: Improved detection of physical CSS properties that need to be logical for RTL support.
-- **Flexible Uploads**: Support for single files, multiple files, and entire folders.
-- **Download Options**: Download fixed code as individual files or as a complete ZIP archive.
-- **Improved UI**: Better formatting for code snippets and property names.
+- **Enhanced RTL Analysis**:
+  - Detects physical properties in JS style objects (e.g., `marginLeft`).
+  - Identifies direction-sensitive `borderRadius` shorthands.
+  - Checks for hardcoded `textAlign` and `float` values.
+  - Flags physical margin/padding utility classes (e.g., `ml-4`, `pr-2`).
 
-## ✨ Usage (simple steps)
-Upload your HTML/CSS → click **Scan** → get a score + issues → download fixed version (Only for CSS).
+![Analysis Example](assets/warnings-example.png)
 
-## 🛠️ Tech stack
-- Frontend: plain React with components from [**React Bits**](https://reactbits.dev), [**GSAP**](https://gsap.com), and icons from [**FontAwesome**](https://fontawesome.com/).
-- CSS Processing: [**PostCSS**](https://postcss.org/) for robust parsing and analysis of CSS files.
-- Syntax Highlighting: [**react-syntax-highlighter**](https://github.com/react-syntax-highlighter/react-syntax-highlighter) (Prism) for code previews.
-- No server required (MVP).  
-- License: MIT
+## 📖 Scoring Model
 
-## 📖 Scoring model
-- Categories & weights for HTML:
-  - Semantic Tags => header, nav, footer — (-20 points each -60 points max)
-  - SEO => meta tags — (-5 points each -25 points max)
-  - Accessibility => alt attribute — (-10 points once)
-  - Language => lang, dir attributes — (-5 points each once)
+We use a weighted scoring system to evaluate your page:
 
-- Categories & weights for CSS:
-  - RTL => Checks for physical properties that should be logical:
-    - Margins (left/right -> inline-start/end)
-    - Paddings (left/right -> inline-start/end)
-    - Borders (left/right -> inline-start/end)
-    - Text Align (left/right -> start/end)
-    - Border Radius (top-left/etc -> start-start/etc) — (-5 points for every match no max)
-    - Positioning (left/right -> inset-inline-start/end)
-  - Units => any fixed units like px — (-5 points once)
+### HTML Checks
+- **Semantic Tags**: `header`, `nav`, `footer` (-20 points each, max -60)
+- **SEO**: Meta tags (-5 points each, max -25)
+- **Accessibility**: `alt` attribute (-10 points once)
+- **Language**: `lang`, `dir` attributes (-5 points each once)
 
-> **Notes:** 1. There is no negative score. 2. Auto-fix is only available for CSS but not for the Units because they are relative to a lot of parameters.
+### CSS Checks
+- **RTL Logic**: Checks for physical properties that should be logical:
+    - Margins/Paddings (left/right → inline-start/end)
+    - Borders (left/right → inline-start/end)
+    - Text Align (left/right → start/end)
+    - Border Radius (-5 points for every match)
+    - Positioning (left/right → inset-inline-start/end)
+- **Units**: Any fixed units like `px` (-5 points once)
 
+> **Note:** There is no negative score (min 0). Auto-fix is available for CSS properties but not for Units.
 
-## 📐 How it works (high level)
-    1. User uploads HTML and CSS files, or pastes them into textareas.  
-    2. App parses the HTML with `DOMParser` and CSS with `PostCSS` to inspect markup and heuristics.  
-    3. App suggests fixes (full fixed version), and offers naive auto-fixes that are safe to preview (e.g., add `lang="ar"`, add `dir="rtl"`, convert `margin-left` → `margin-inline-start`, and "explodes" shorthand `border-radius: 8px 0 0 8px` into 4 logical lines).
-    4. Results are shown with links for blog sections to learn how to fix them if not auto-fix supported.
+## 📐 How it works
 
-## ⭕ Limitations (clear & exact)
-- **HTML & React**: The app works with static HTML files and now supports **React components** (`.jsx`, `.tsx`) directly. You can upload them or paste the code to get an analysis of your component's structure and styling.  
-- **Images:** The scanner does **not** analyze image content, so images are not a problem.  
-- **Heuristics:** The checks are heuristic and conservative. They may sometimes flag items that are actually fine. Auto-fixes are safe and reversible, but always double-check the suggested changes before applying them to production.
+1.  **Upload/Paste**: User uploads HTML/CSS files or pastes code.
+2.  **Parse**: App parses HTML with `DOMParser` and CSS with `PostCSS`.
+3.  **Analyze & Fix**: App suggests fixes and offers naive auto-fixes (e.g., converting `margin-left` → `margin-inline-start`, exploding `border-radius`).
+4.  **Learn**: Results link to educational blog sections.
 
-> **Note:** You don't need to follow all the fixes shown because they are meant for a full UI page in HTML. For React, you may put each one in its own component, and you may only include the meta tags to the main `index.html` (which doesn't have any semantic elements because they are in the JS files).
+![Blog Example](assets/blog-section1-example.png)
+
+## ⭕ Limitations
+
+-   **Images**: Does not analyze image content.
+-   **Heuristics**: Checks are conservative. Always double-check suggested auto-fixes.
 
 ## 🌐 Online Demo
-You can use an online demo on Vercel at this link: [arabify-by-taim-kellizy.vercel.app](https://arabify-by-taim-kellizy.vercel.app)
 
-## 🚀 Getting Started
+Try it out here: [**arabify-by-taim-kellizy.vercel.app**](https://arabify-by-taim-kellizy.vercel.app)
 
-Follow these steps to run the project locally on your machine.
+## 📝 How to Build
 
 ### Prerequisites
-Make sure you have **Node.js** installed.
+-   **Node.js** installed.
 
 ### Installation
 
 1.  **Clone the repository**
     ```bash
     git clone https://github.com/Taimkellizy/ArabifyByTaimKellizy.git
-    ```
-
-2.  **Navigate to the project folder**
-    ```bash
     cd arabifybytaimkellizy
     ```
 
-3.  **Install dependencies** (Important!)
-    This downloads React, GSAP, FontAwesome, and PostCSS.
+2.  **Install dependencies**
     ```bash
     npm install
     ```
 
-4.  **Start the development server**
+3.  **Start the development server**
     ```bash
     npm start
     ```
 
-The app will automatically open in your browser at `http://localhost:3000`.
-
-### 🧪 Running Tests
-To ensure the application logic is working correctly (especially the analyzers), run the test suite:
-```bash
-npm test
-```
-(Press `a` to run all tests if prompted).
+4.  **Running Tests**
+    ```bash
+    npm test
+    ```
 
 ## 📂 Project Structure
 
 ```text
 src/
 ├── App.js          # Main application logic & Language state
-├── App.css         # Global styles & Responsive rules
 ├── components/     # Reusable UI & Logic components
-│   ├── analyzeCSS.js   # Algorithm for processing the CSS (using PostCSS)
-│   ├── analyzeHTML.js  # Algorithm for processing the HTML
-│   ├── analyzeJSX.js   # Algorithm for processing JSX/TSX (using Babel)
-│   ├── CodeWindow.js   # Custom component for code preview
-│   ├── CodeWindow.css  # Styles for CodeWindow.js
-│   ├── Header.js       # Header component
-│   ├── Footer.js       # Footer component
-│   └── split_text.js   # Custom GSAP animation component
+│   ├── analyzeCSS.js   # Algorithm for processing CSS (PostCSS)
+│   ├── analyzeHTML.js  # Algorithm for processing HTML
+│   ├── analyzeJSX.js   # Algorithm for processing JSX/TSX
+│   └── ...
 ├── pages/          # Route pages
 │   ├── Home.js         # Main landing & tool page
 │   └── Blog.js         # Educational content page
-├── content.js      # Dictionary for English/Arabic text
-├── codeSnippets.js # Shared code examples for Blog
-└── index.js        # Entry point
+└── content.js      # Dictionary for English/Arabic text
+```
+
+## 🤝 Feedback and Contributions
+
+Your input is crucial for our continuous improvement. Whether you have feedback on features, bugs, or suggestions, we're eager to hear from you.
+
+## 📃 License
+
+Distributed under the **MIT License**.
+
+## 🗨️ Contacts
+
+-   **Email**: [taimkellizy@gmail.com](mailto:taimkellizy@gmail.com)
+-   **LinkedIn**: [Taim Kellizy](https://www.linkedin.com/in/taimkellizy/)
+
+[Back to top](#top)
