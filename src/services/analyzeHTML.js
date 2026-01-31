@@ -1,5 +1,15 @@
 import { injectVanillaLogic } from '../utils/vanillaInjector';
 
+/**
+ * Analyzes HTML code for structure, accessibility, SEO, and required attributes.
+ * @param {string} htmlString - The HTML code to analyze.
+ * @param {object} text - The localization object.
+ * @param {object} options - Configuration options.
+ * @param {boolean} [options.isMainFile=true] - Whether this is the main entry file (index.html).
+ * @param {boolean} [options.checkStructure=false] - Whether to enforce strict structure based on file type.
+ * @param {string} [options.mode='scan'] - Analysis mode ('scan', 'fix', 'multi-lang').
+ * @returns {object} Result object containing score, warnings, foundTags, and fixedCode.
+ */
 const analyzeHTML = (htmlString, text, options = { isMainFile: true, checkStructure: false, mode: 'scan' }) => {
   let score = 100;
   let warnings = [];

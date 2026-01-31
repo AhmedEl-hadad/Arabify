@@ -175,9 +175,24 @@ export const injectToggle = (code) => {
 
     if (alreadyInjected) return code;
     
-    // Prioritize List inside Nav, then Nav itself. Ignore Header to avoid duplicate injection in App.js.
+    // Prioritize List inside Nav, then Nav itself. If neither, fallback to Header.
     const insertionNode = targetList || targetNode;
-    if (!insertionNode) return code;
+    
+    // If still no insertion node, try to find a header
+    let headerNode = null;
+    if (!insertionNode) {
+        traverse(ast, {
+            JSXElement: (node) => {
+                const name = node.openingElement.name.name;
+                if (name === 'header') {
+                    headerNode = node;
+                }
+            }
+        });
+    }
+
+    const finalTarget = insertionNode || headerNode;
+    if (!finalTarget) return code;
 
     // --- EXECUTE INJECTION ---
 
@@ -194,8 +209,8 @@ export const injectToggle = (code) => {
     const offset = newCode.length - code.length;
 
     // 2. Inject Toggle Button
-    if (insertionNode.closingElement) {
-        const insertPos = insertionNode.closingElement.start + offset;
+    if (finalTarget.closingElement) {
+        const insertPos = finalTarget.closingElement.start + offset;
         
         // Detect indentation of the closing tag line
         const codeBeforeClose = newCode.slice(0, insertPos);

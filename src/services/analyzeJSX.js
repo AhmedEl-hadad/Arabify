@@ -2,6 +2,16 @@ import { parse } from '@babel/parser';
 
 import { injectProvider, injectToggle } from '../utils/reactInjector';
 
+/**
+ * Analyzes JSX/React code for inline styles, semantic structure, and accessibility.
+ * Handles AST modifications for auto-fixing physical properties and injecting LanguageContext.
+ * @param {string} codeString - The JSX code to analyze.
+ * @param {object} text - The localization object.
+ * @param {object} options - Configuration options.
+ * @param {string} [options.mode='scan'] - Analysis mode ('scan', 'fix', 'multi-lang').
+ * @param {boolean} [options.isAppFile=false] - Whether this is the main App component.
+ * @returns {object} Result object containing score, warnings, foundTags, and fixedCode.
+ */
 const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false }) => {
     let score = 100;
     let warnings = [];
@@ -164,11 +174,86 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
         }
     }
 
-    // --- MULTI-LANG INJECTION ---
-    if (options.mode === 'multi-lang') {
-        let injected = false;
-        let modifiedCode = codeString; // Start with original
+    // --- MULTI-LANG INJECTION & FIXES ---
+    let modifiedCode = codeString;
+    let injected = false;
+    let styleFixed = false;
+    
+    // 0. Apply Style Fixes (Replacements)
+    // We collect replacements during traversal. BUT we need to be careful.
+    // Let's re-traverse or collect during the first pass.
+    // To keep it simple and safe, let's collect findings in the main traversal and apply them here IF mode allows.
+    
+    if (options.mode === 'fix' || options.mode === 'multi-lang') {
+        const replacements = [];
+        const fixVisitor = {
+             ObjectExpression: (node) => {
+                node.properties.forEach(prop => {
+                    if (!prop.key) return;
+                    const keyName = prop.key.name || prop.key.value;
+                    const valNode = prop.value;
 
+                    // Helper to push replacement
+                    const addReplacement = (start, end, text) => {
+                        replacements.push({ start, end, text });
+                    };
+
+                    // KEY MAPPINGS
+                    const keyMap = {
+                        'marginLeft': 'marginInlineStart',
+                        'marginRight': 'marginInlineEnd',
+                        'paddingLeft': 'paddingInlineStart',
+                        'paddingRight': 'paddingInlineEnd',
+                        'borderLeft': 'borderInlineStart',
+                        'borderRight': 'borderInlineEnd',
+                        'borderTopLeftRadius': 'borderStartStartRadius',
+                        'borderTopRightRadius': 'borderStartEndRadius',
+                        'borderBottomLeftRadius': 'borderEndStartRadius',
+                        'borderBottomRightRadius': 'borderEndEndRadius',
+                        'left': 'insetInlineStart', // Positioning
+                        'right': 'insetInlineEnd'
+                    };
+
+                    if (keyMap[keyName]) {
+                        // Replace Key
+                        addReplacement(prop.key.start, prop.key.end, keyMap[keyName]);
+                    }
+
+                    // VALUE MAPPINGS
+                    // Handle literal strings
+                    if (valNode && (valNode.type === 'StringLiteral' || valNode.type === 'Literal')) {
+                        const val = valNode.value;
+                        if (keyName === 'textAlign' || keyName === 'text-align') {
+                            if (val === 'left') addReplacement(valNode.start, valNode.end, "'start'");
+                            if (val === 'right') addReplacement(valNode.start, valNode.end, "'end'");
+                        }
+                        if (keyName === 'float') {
+                            if (val === 'left') addReplacement(valNode.start, valNode.end, "'inline-start'");
+                            if (val === 'right') addReplacement(valNode.start, valNode.end, "'inline-end'");
+                        }
+                        // Clear/Positioning? (Usually handled by CSS, but good to have)
+                    }
+                });
+             }
+        };
+
+        // Run visitor to collect replacements
+        traverse(ast, fixVisitor);
+
+        if (replacements.length > 0) {
+            // Sort Descending to prevent index shift
+            replacements.sort((a, b) => b.start - a.start);
+            
+            // Apply replacements
+            replacements.forEach(rep => {
+                modifiedCode = modifiedCode.slice(0, rep.start) + rep.text + modifiedCode.slice(rep.end);
+            });
+            styleFixed = true;
+        }
+    }
+
+
+    if (options.mode === 'multi-lang') {
         // 1. Inject Provider if it's the App File
         if (options.isAppFile) {
             modifiedCode = injectProvider(modifiedCode);
@@ -180,10 +265,10 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
             modifiedCode = injectToggle(modifiedCode);
             injected = true;
         }
+    }
 
-        if (injected) {
-            fixedCode = modifiedCode;
-        }
+    if (injected || styleFixed) {
+        fixedCode = modifiedCode;
     }
 
     return { score, warnings, foundTags, fixedCode }; // Return foundTags & fixedCode

@@ -109,7 +109,7 @@ function Navbar() {
         expect(result).toMatch(/<LanguageToggle \/>\s*<\/nav>/);
     });
 
-    test('does NOT inject into <header> (Duplicate Prevention)', () => {
+    test('injects into <header> if no <nav> found (Fallback)', () => {
         const code = `import React from 'react';
 function Header() {
   return (
@@ -119,8 +119,8 @@ function Header() {
   );
 }`;
         const result = injectToggle(code);
-        expect(result).not.toContain('LanguageToggle');
-        expect(result).toBe(code);
+        expect(result).toContain('LanguageToggle');
+        expect(result).toMatch(/<LanguageToggle \/>\s*<\/header>/);
     });
 
     test('detects and respects 4-space indentation', () => {

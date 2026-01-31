@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useContext } from 'react';
-import SplitText from '../components/split_text';
+import SplitText from '../components/SplitText';
 import CodeWindow from '../components/CodeWindow';
-import analyzeHTML from '../components/analyzeHTML';
-import analyzeCSS from '../components/analyzeCSS';
-import analyzeJSX from '../components/analyzeJSX';
+import analyzeHTML from '../services/analyzeHTML';
+import analyzeCSS from '../services/analyzeCSS';
+import analyzeJSX from '../services/analyzeJSX';
 import ConfigWizard from '../components/ConfigWizard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faUpload, faCode, faFolderOpen, faFile, faChevronDown, faFileImage, faFileAlt } from '@fortawesome/free-solid-svg-icons';
@@ -120,12 +120,12 @@ const Home = () => {
         result = { ...result, score, warnings, fixedCode };
       } else if (file.type === 'css') {
         const { score, warnings, fixedCSS } = await analyzeCSS(file.content, text);
-        // Only attach fixedCode if mode is 'fix'
+        // Only attach fixedCode if mode is 'fix' OR 'multi-lang'
         result = {
           ...result,
           score,
           warnings,
-          fixedCode: config.mode === 'fix' ? fixedCSS : null
+          fixedCode: (config.mode === 'fix' || config.mode === 'multi-lang') ? fixedCSS : null
         };
       } else if (file.type === 'jsx') {
         const { score, warnings, foundTags, fixedCode } = analyzeJSX(file.content, text, {

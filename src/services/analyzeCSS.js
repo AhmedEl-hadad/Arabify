@@ -1,6 +1,12 @@
 import postcss from 'postcss';
 import safeParser from 'postcss-safe-parser';
 
+/**
+ * Analyzes CSS code for RTL compatibility, responsiveness, and best practices.
+ * @param {string} cssString - The CSS code to analyze.
+ * @param {object} text - The localization object containing error messages and labels.
+ * @returns {Promise<object>} Result object containing score, warnings, and fixedCSS.
+ */
 const analyzeCSS = async (cssString, text) => {
   let score = 100;
   let warnings = [];
@@ -53,6 +59,19 @@ const analyzeCSS = async (cssString, text) => {
           decl.value = 'end';
           score -= 5;
           warnings.push({ type: text.errtypeRTL, msg: text.fixTextAlign, blogID: 7 });
+        }
+      }
+
+      // Float
+      else if (decl.prop === 'float') {
+        if (decl.value === 'left') {
+          decl.value = 'inline-start';
+          score -= 5;
+          warnings.push({ type: text.errtypeRTL, msg: text.fixFloat, blogID: 7 });
+        } else if (decl.value === 'right') {
+          decl.value = 'inline-end';
+          score -= 5;
+          warnings.push({ type: text.errtypeRTL, msg: text.fixFloat, blogID: 7 });
         }
       }
 

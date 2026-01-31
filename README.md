@@ -49,17 +49,18 @@
 
 #### ⚡ New Features & Improvements
 
+- **Multi-Language & CSS Fixes**:
+  - **Auto-Fix Float**: Automatically converts `float: left` to `float: inline-start` and `float: right` to `float: inline-end`.
+  - **JSX Inline Style Fixes**: Now transforms inline style objects in JSX (e.g., `style={{ marginLeft: 10 }}`) to use logical properties (`marginInlineStart`).
+  - **Multi-Lang Integration**: CSS fixes are now automatically applied when running "Multi-Language Mode".
 - **Smart React Injection Engine**:
   - **Dynamic Indentation**: Automatically detects and respects existing 2-space or 4-space indentation options.
   - **Smart Placement**: Intelligently places the `LanguageToggle` inside list items (`<li>`) if a list is detected within the `<nav>`.
   - **Duplication Prevention**: Safely ignores `<header>` if a `Navbar` is present and performs robust AST checks to prevent double-injection.
-- **Modernized CSS & RTL**:
-  - Refactored core styling to use **Logical Properties** (e.g., `margin-inline-start` instead of `margin-left`) for perfect LTR/RTL flipping.
-  - Migrated hardcoded pixel values to `rem` units for full responsiveness.
-  - Replaced legacy `float` layouts with modern **Flexbox** implementations.
-- **Enhanced Reliability**:
-  - Comprehensive unit test coverage for the injection logic (indentation, placement, duplication).
-  - Fixed edge cases in JSX analysis for layout structure detection.
+  - **Header Fallback**: If no `<nav>` is found, strictly injects into `<header>` to ensure accessibility.
+- **Codebase Refactoring**:
+  - Analyzers moved to `src/services` for better separation of concerns.
+  - Standardized component naming (`SplitText.js`).
 
 ![Analysis Example](assets/warnings-example.png)
 
@@ -141,7 +142,8 @@ Try it out here: [**arabify-by-taim-kellizy.vercel.app**](https://arabify-by-tai
 ```text
 src/
 ├── App.js          # Main application logic & Language state
-├── components/     # Reusable UI & Logic components
+├── components/     # Reusable UI components
+├── services/       # Core Analysis Logic
 │   ├── analyzeCSS.js   # Algorithm for processing CSS (PostCSS)
 │   ├── analyzeHTML.js  # Algorithm for processing HTML
 │   ├── analyzeJSX.js   # Algorithm for processing JSX/TSX
