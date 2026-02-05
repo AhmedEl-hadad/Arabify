@@ -26,7 +26,7 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
     } catch (e) {
         // If parsing fails, return a fatal error or just basic score reduction
         console.error("JSX Parse Error:", e);
-        return { score: 0, warnings: [{ type: "Syntax Error", msg: text.msgParseError, blogID: 0 }] };
+        return { score: 0, warnings: [{ type: "errtypeGeneric", code: "PARSE_ERROR", blogID: 0 }] };
     }
 
     // Helper to traverse AST
@@ -69,7 +69,7 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
 
                 if (physicalProps.includes(keyName)) {
                     score -= 5;
-                    warnings.push({ type: text.errtypeRTL, msg: text.msgAvoidPhysicalProp(keyName), blogID: 3 });
+                    warnings.push({ type: "errtypeRTL", code: "AVOID_PHYSICAL_PROP", args: [keyName], blogID: 3 });
                 }
 
                 // 2. Check Values (textAlign, float)
@@ -82,13 +82,13 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
                 if (keyName === 'textAlign' || keyName === 'text-align') {
                     if (valueNode && (valueNode.value === 'left' || valueNode.value === 'right')) {
                         score -= 5;
-                        warnings.push({ type: text.errtypeRTL, msg: text.msgAvoidTextAlign, blogID: 3 });
+                        warnings.push({ type: "errtypeRTL", code: "AVOID_TEXT_ALIGN", blogID: 3 });
                     }
                 }
                 if (keyName === 'float') {
                     if (valueNode && (valueNode.value === 'left' || valueNode.value === 'right')) {
                         score -= 5;
-                        warnings.push({ type: text.errtypeRTL, msg: text.msgAvoidFloat, blogID: 3 });
+                        warnings.push({ type: "errtypeRTL", code: "AVOID_FLOAT", blogID: 3 });
                     }
                 }
 
@@ -98,7 +98,7 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
                         const parts = valueNode.value.trim().split(/\s+/);
                         if (parts.length === 4) { // 4 values are direction sensitive (top-left, top-right, bottom-right, bottom-left)
                             score -= 5;
-                            warnings.push({ type: text.errtypeRTL, msg: text.msgAvoidBorderRadiusShorthand, blogID: 3 });
+                            warnings.push({ type: "errtypeRTL", code: "AVOID_BORDER_RADIUS_SHORTHAND", blogID: 3 });
                         }
                     }
                 }
@@ -111,14 +111,15 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
 
 
 
-            // Accessibility: img alt
+                // Accessibility: img alt
             if (name === 'img') {
                 const altAttr = node.attributes.find(attr => attr.type === 'JSXAttribute' && attr.name.name === 'alt');
                 if (!altAttr) {
                     score -= 5;
                     warnings.push({
-                        type: text.errtypeAlt,
-                        msg: text.msgMissingAlt("?"), // We don't have easy index here, using generic msg
+                        type: "errtypeAlt",
+                        code: "MISSING_ALT",
+                        args: [],
                         blogID: 2
                     });
                 }
@@ -138,8 +139,8 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
                 if (node.selfClosing && !hasLabel) {
                     score -= 5;
                     warnings.push({
-                        type: text.errtypeAlt,
-                        msg: text.msgEmptyButton,
+                        type: "errtypeAlt",
+                        code: "EMPTY_BUTTON",
                         blogID: 2
                     });
                 }
@@ -164,13 +165,13 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
 
     // Structure Checks
     if (foundTags.has('main') || foundTags.has('body')) {
-        if (!foundTags.has('header')) {
-            score -= 5;
-            warnings.push({ type: text.errtypeStructure, msg: text.msgMissingHeader, blogID: 1 });
+        // The instruction snippet adds `&& isAppFile` and removes `score -= 5;`
+        // `isAppFile` is `options.isAppFile`.
+        if (!foundTags.has('header') && options.isAppFile) {
+            warnings.push({ type: "errtypeStructure", code: "MISSING_HEADER", blogID: 1 });
         }
-        if (!foundTags.has('footer')) {
-            score -= 5;
-            warnings.push({ type: text.errtypeStructure, msg: text.msgMissingFooter, blogID: 1 });
+        if (!foundTags.has('footer') && options.isAppFile) {
+            warnings.push({ type: "errtypeStructure", code: "MISSING_FOOTER", blogID: 1 });
         }
     }
 
@@ -290,14 +291,15 @@ const checkClassName = (className, warnings, text) => {
     // Better to check for word boundaries or specific tailwind classes
     // For now, let's look for "text-left", "text-right", "float-left", "float-right"
 
-    if (/\btext-left\b/.test(className) || /\btext-right\b/.test(className)) {
-        // We assume this is covered by general RTL warning or we add a new one
-        // For now, let's just use the generic RTL msg
-        warnings.push({ type: text.errtypeRTL, msg: text.msgAvoidTextLeftRightClass, blogID: 3 });
+    // The instruction snippet replaces the original regex check and adds a score reduction.
+    // 1. Text alignment classes (left/right)
+    if (className.match(/\b(text-left|text-right)\b/)) {
+        warnings.push({ type: "errtypeRTL", code: "AVOID_TEXT_LEFT_RIGHT_CLASS", blogID: 3 });
+        // score -= 5; // Score reduction is handled in the main analyzeJSX function, not here.
     }
 
     if (/\b(ml-|mr-|pl-|pr-)\d+/.test(className)) {
-        warnings.push({ type: text.errtypeRTL, msg: text.msgAvoidPhysicalMarginPaddingClass, blogID: 3 });
+        warnings.push({ type: "errtypeRTL", code: "AVOID_PHYSICAL_MARGIN_PADDING_CLASS", blogID: 3 });
     }
 };
 

@@ -6,14 +6,17 @@ import analyzeCSS from '../services/analyzeCSS';
 import analyzeJSX from '../services/analyzeJSX';
 import ConfigWizard from '../components/ConfigWizard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faUpload, faCode, faFolderOpen, faFile, faChevronDown, faFileImage, faFileAlt } from '@fortawesome/free-solid-svg-icons';
-import { faGithub, faHtml5, faCss3, faReact } from '@fortawesome/free-brands-svg-icons';
+import { faCheck, faUpload, faFile, faFolderOpen, faCode, faFileAlt, faFileImage, faFileExport } from '@fortawesome/free-solid-svg-icons';
+import { faReact, faHtml5, faCss3, faGithub } from '@fortawesome/free-brands-svg-icons';
 import Confetti from 'react-confetti';
 import { Link } from 'react-router-dom';
 import JSZip from 'jszip';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { contextTemplate, toggleTemplate } from '../utils/reactGenerators';
 import { scanFiles } from '../utils/fileScanner';
+import { content } from '../content';
+import ProjectScoreCard from '../components/ProjectScoreCard';
+import { calculateProjectScore } from '../utils/scoreCalculator';
 
 const Home = () => {
     const { text, lang } = useContext(LanguageContext);
@@ -183,7 +186,7 @@ const Home = () => {
           ...result,
           score,
           warnings,
-          fixedCode: (config.mode === 'fix' || config.mode === 'multi-lang') ? fixedCSS : null
+          fixedCode: (config.mode === 'fix-css' || config.mode === 'fix-all') ? fixedCSS : null
         };
       } else if (file.type === 'jsx') {
         const { score, warnings, foundTags, fixedCode } = analyzeJSX(file.content, text, {
@@ -195,7 +198,7 @@ const Home = () => {
         result = { ...result, score, warnings, fixedCode };
 
         // Multi-Lang Logic Check
-        if (config.mode === 'multi-lang' && config.projectType !== 'vanilla' && file.name === config.appFileName) {
+        if ((config.mode === 'fix-lang' || config.mode === 'fix-all') && config.projectType !== 'vanilla' && file.name === config.appFileName) {
           // Simple Heuristic Check for Context/Provider/Dir Logic
           const content = file.content;
           // Looking for common patterns like <LanguageContext.Provider>, <IntlProvider>, or logic handling direction
@@ -207,8 +210,8 @@ const Home = () => {
           if (!hasLangLogic) {
             result.score = Math.max(0, result.score - 20);
             result.warnings.push({
-              type: text.errtypeLanguage, // use existing key
-              msg: text.msgMissingLangLogic,
+              type: "errtypeLanguage", // use existing key
+              code: "MISSING_LANG_LOGIC",
               blogID: 5
             });
           }
@@ -235,13 +238,13 @@ const Home = () => {
             if (newResults[finalTargetIndex]) {
                 // Deduplicate local warnings
                 missingTags.forEach(tag => {
-                   const localMsg = tag === '<header>' ? text.msgMissingHeader :
-                                    tag === '<footer>' ? text.msgMissingFooter :
-                                    tag === '<main>' ? text.msgMissingMain : null;
+                   const localCode = tag === '<header>' ? "MISSING_HEADER" :
+                                    tag === '<footer>' ? "MISSING_FOOTER" :
+                                    tag === '<main>' ? "MISSING_MAIN" : null;
                    
-                   if (localMsg) {
+                   if (localCode) {
                        const originalLength = newResults[finalTargetIndex].warnings.length;
-                       newResults[finalTargetIndex].warnings = newResults[finalTargetIndex].warnings.filter(w => w.msg !== localMsg);
+                       newResults[finalTargetIndex].warnings = newResults[finalTargetIndex].warnings.filter(w => w.code !== localCode);
                        if (newResults[finalTargetIndex].warnings.length < originalLength) {
                            // Refund the local penalty since we are replacing it with a global one
                            newResults[finalTargetIndex].score += 5; 
@@ -250,8 +253,9 @@ const Home = () => {
                 });
 
                 const globalWarnings = missingTags.map(tag => ({
-                    type: text.errtypeStructure,
-                    msg: text.msgGlobalMissingTag(tag),
+                    type: "errtypeStructure",
+                    code: "GLOBAL_MISSING_TAG",
+                    args: [tag],
                     blogID: 1
                 }));
                 
@@ -288,7 +292,7 @@ const Home = () => {
     });
 
     // --- MULTI-LANG INJECTION (React Only) ---
-    if (analysisConfig && analysisConfig.mode === 'multi-lang' && analysisConfig.projectType === 'react') {
+    if (analysisConfig && (analysisConfig.mode === 'fix-lang' || analysisConfig.mode === 'fix-all') && analysisConfig.projectType === 'react') {
         // Find the root folder (where App.js is located)
         // Heuristic: Use the folder containing the App File as the "src" root
         const appFile = uploadedFiles.find(f => f.name === analysisConfig.appFileName || f.path.endsWith(`/${analysisConfig.appFileName}`));
@@ -322,6 +326,51 @@ const Home = () => {
     const file = new Blob([content], { type: 'text/plain' });
     element.href = URL.createObjectURL(file);
     element.download = "fixed-" + filename;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const downloadReport = () => {
+    const report = {
+      timestamp: new Date().toISOString(),
+      projectStats: {
+        totalFiles: results.length,
+        averageScore: calculateProjectScore(results, analysisConfig),
+        displayScoreType: "Weighted (Main Files x2)",
+        allPerfect: results.every(r => r.score === 100)
+      },
+      files: results.map(r => ({
+        fileName: r.fileName,
+        path: r.path,
+        fileType: r.type,
+        score: r.score,
+        issues: r.warnings.map(w => {
+          // ALWAYS USE ENGLISH FOR JSON REPORT
+          let errorDef = content.en.errors[w.code];
+          
+          // Handle dynamic errors (functions)
+          if (typeof errorDef === 'function') {
+            errorDef = errorDef(...(w.args || []));
+          }
+          
+          const messageText = errorDef ? errorDef.text : "Unknown Error";
+            
+          return {
+            type: content.en[w.type] || w.type, // Resolve type code to English
+            severity: "warning",
+            code: w.code,
+            message: messageText,
+            documentationId: w.blogID
+          };
+        })
+      }))
+    };
+
+    const element = document.createElement("a");
+    const file = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+    element.href = URL.createObjectURL(file);
+    element.download = "analysis-report.json";
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
@@ -466,7 +515,7 @@ const Home = () => {
 
         </section>
 
-        {uploadedFiles.length > 0 && (
+            {uploadedFiles.length > 0 && (
           <div className='analyse-btn'>
             <button onClick={initiateAnalysis} className="btn" disabled={isAnalyzing}>
               {isAnalyzing ? text.analyzing : text.analyzeBtn}
@@ -476,6 +525,12 @@ const Home = () => {
               <button onClick={uploadedFiles.length > 1 ? downloadAllFixed : () => downloadSingleFile(results[0].fixedCode, results[0].fileName)} className="btn">
                 {uploadedFiles.length > 1 ? text.downloadZip : text.downloadFixed}
               </button>
+            )}
+            
+            {results.length > 0 && (
+                <button onClick={downloadReport} className="btn" style={{ gap: '10px' }}>
+                    {text.downloadReport || "Download JSON Report"} <FontAwesomeIcon icon={faFileExport} />
+                </button>
             )}
           </div>
         )}
@@ -492,51 +547,70 @@ const Home = () => {
                 style={{ position: 'fixed', top: 0, insetInlineStart: 0, zIndex: 9999, pointerEvents: 'none' }}
               />
             )}
+            
+            {/* PROJECT SCORECARD - EXTRACTED */}
+            <ProjectScoreCard 
+                score={calculateProjectScore(results, analysisConfig)} 
+                totalScoreLabel={text.totalScore} 
+            />
 
             {results.map((res, idx) => (
               <div key={idx} className={`results-section ${getResultClass(res.score)}`} style={{ marginBottom: '20px' }}>
                 <h3>{res.fileName} - {text.score} {res.score}/100</h3>
 
-                {Object.entries(
-                  res.warnings.reduce((acc, warn) => {
-                    const type = warn.type || "Other";
-                    if (!acc[type]) acc[type] = [];
-                    acc[type].push(warn);
-                    return acc;
-                  }, {})
-                ).map(([type, warnings], groupIdx) => (
-                  <div key={groupIdx} className="warning-group">
-                    <h4 className="warning-group-title">
-                      {type}
-                    </h4>
+                  {Object.entries(
+                    res.warnings.reduce((acc, warn) => {
+                      const typeCode = warn.type || "Other";
+                      // Group by the actual type key (e.g., errtypeRTL)
+                      if (!acc[typeCode]) acc[typeCode] = [];
+                      acc[typeCode].push(warn);
+                      return acc;
+                    }, {})
+                  ).map(([typeCode, warnings], groupIdx) => (
+                    <div key={groupIdx} className="warning-group">
+                      <h4 className="warning-group-title">
+                        {/* Resolve type code to localized text (e.g. text.errtypeRTL) */}
+                        {text[typeCode] || typeCode}
+                      </h4>
                     <ul className="warning-list">
-                      {warnings.map((warn, index) => (
-                        <li key={index} className="warning-item">
-                          {warn.blogID ? (
-                            <Link
-                              to={`/blog#post-${warn.blogID}`}
-                              className="fix-link"
-                            >
-                              <span style={{ lineHeight: '1.5' }}>•</span>
-                              <span>
-                                {warn.msg}
-                                <span className="fix-link-text">
-                                  {text.howToFix}
+                      {warnings.map((warn, index) => {
+                        let errorDef = text.errors[warn.code];
+                        
+                        // Handle dynamic errors (functions)
+                        if (typeof errorDef === 'function') {
+                          errorDef = errorDef(...(warn.args || []));
+                        }
+
+                        const messageUI = errorDef ? errorDef.ui : "Unknown Error";
+
+                        return (
+                          <li key={index} className="warning-item">
+                            {warn.blogID ? (
+                              <Link
+                                to={`/blog#post-${warn.blogID}`}
+                                className="fix-link"
+                              >
+                                <span style={{ lineHeight: '1.5' }}>•</span>
+                                <span>
+                                  {messageUI}
+                                  <span className="fix-link-text">
+                                    {text.howToFix}
+                                  </span>
                                 </span>
-                              </span>
-                            </Link>
-                          ) : (
-                            <div className="warning-msg-container">
-                              <span style={{ lineHeight: '1.5' }}>•</span>
-                              <span>{warn.msg}</span>
-                            </div>
-                          )}
-                        </li>
-                      ))}
+                              </Link>
+                            ) : (
+                              <div className="warning-msg-container">
+                                <span style={{ lineHeight: '1.5' }}>•</span>
+                                <span>{messageUI}</span>
+                              </div>
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 ))}
-                {res.warnings.length === 0 && <p>{text.noIssues}</p>}
+      {res.warnings.length === 0 && <p>{text.noIssues}</p>}
               </div>
             ))}
           </div>

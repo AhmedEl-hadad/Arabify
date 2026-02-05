@@ -1,0 +1,339 @@
+{
+  "timestamp": "2026-02-05T19:13:47.346Z",
+  "projectStats": {
+    "totalFiles": 4,
+    "averageScore": 88,
+    "allPerfect": false
+  },
+  "files": [
+    {
+      "fileName": "App.css",
+      "path": "src0/App.css",
+      "fileType": "css",
+      "score": 65,
+      "issues": [
+        {
+          "type": "Responsiveness",
+          "severity": "warning",
+          "message": {
+            "key": null,
+            "props": {
+              "children": [
+                "Found fixed ",
+                {
+                  "type": "span",
+                  "key": null,
+                  "props": {
+                    "className": "en-code",
+                    "children": "px"
+                  },
+                  "_owner": null,
+                  "_store": {}
+                },
+                " values larger than 10px. Use ",
+                {
+                  "type": "span",
+                  "key": null,
+                  "props": {
+                    "className": "en-code",
+                    "children": "rem"
+                  },
+                  "_owner": null,
+                  "_store": {}
+                },
+                " for fonts and spacing."
+              ]
+            },
+            "_owner": null,
+            "_store": {}
+          },
+          "documentationId": 4
+        },
+        {
+          "type": "RTL Styling",
+          "severity": "warning",
+          "message": {
+            "key": null,
+            "props": {
+              "children": [
+                "Found hardcoded ",
+                {
+                  "type": "span",
+                  "key": null,
+                  "props": {
+                    "className": "en-code",
+                    "children": "text-align"
+                  },
+                  "_owner": null,
+                  "_store": {}
+                },
+                ". Use",
+                " ",
+                {
+                  "type": "span",
+                  "key": null,
+                  "props": {
+                    "className": "en-code",
+                    "children": "start/end"
+                  },
+                  "_owner": null,
+                  "_store": {}
+                },
+                " to align correctly in Arabic."
+              ]
+            },
+            "_owner": null,
+            "_store": {}
+          },
+          "documentationId": 7
+        },
+        {
+          "type": "RTL Styling",
+          "severity": "warning",
+          "message": {
+            "key": null,
+            "props": {
+              "children": [
+                "Found physical float. Use",
+                " ",
+                {
+                  "type": "span",
+                  "key": null,
+                  "props": {
+                    "className": "en-code",
+                    "children": "inline-start/inline-end"
+                  },
+                  "_owner": null,
+                  "_store": {}
+                },
+                "."
+              ]
+            },
+            "_owner": null,
+            "_store": {}
+          },
+          "documentationId": 7
+        },
+        {
+          "type": "RTL Styling",
+          "severity": "warning",
+          "message": {
+            "key": null,
+            "props": {
+              "children": [
+                "Found physical ",
+                {
+                  "type": "span",
+                  "key": null,
+                  "props": {
+                    "className": "en-code",
+                    "children": "border-left"
+                  },
+                  "_owner": null,
+                  "_store": {}
+                },
+                ". Use",
+                " ",
+                {
+                  "type": "span",
+                  "key": null,
+                  "props": {
+                    "className": "en-code",
+                    "children": "border-inline-start"
+                  },
+                  "_owner": null,
+                  "_store": {}
+                },
+                "."
+              ]
+            },
+            "_owner": null,
+            "_store": {}
+          },
+          "documentationId": 3
+        },
+        {
+          "type": "RTL Styling",
+          "severity": "warning",
+          "message": {
+            "key": null,
+            "props": {
+              "children": [
+                "Found physical float. Use",
+                " ",
+                {
+                  "type": "span",
+                  "key": null,
+                  "props": {
+                    "className": "en-code",
+                    "children": "inline-start/inline-end"
+                  },
+                  "_owner": null,
+                  "_store": {}
+                },
+                "."
+              ]
+            },
+            "_owner": null,
+            "_store": {}
+          },
+          "documentationId": 7
+        },
+        {
+          "type": "RTL Styling",
+          "severity": "warning",
+          "message": {
+            "key": null,
+            "props": {
+              "children": [
+                "Found physical property ",
+                {
+                  "type": "span",
+                  "key": null,
+                  "props": {
+                    "className": "en-code",
+                    "children": "padding-left"
+                  },
+                  "_owner": null,
+                  "_store": {}
+                },
+                ". Use ",
+                {
+                  "type": "span",
+                  "key": null,
+                  "props": {
+                    "className": "en-code",
+                    "children": "padding-inline-start"
+                  },
+                  "_owner": null,
+                  "_store": {}
+                },
+                " for RTL support."
+              ]
+            },
+            "_owner": null,
+            "_store": {}
+          },
+          "documentationId": 3
+        },
+        {
+          "type": "RTL Styling",
+          "severity": "warning",
+          "message": {
+            "key": null,
+            "props": {
+              "children": [
+                "Found physical positioning ",
+                {
+                  "type": "span",
+                  "key": null,
+                  "props": {
+                    "className": "en-code",
+                    "children": "left"
+                  },
+                  "_owner": null,
+                  "_store": {}
+                },
+                ". Use",
+                " ",
+                {
+                  "type": "span",
+                  "key": null,
+                  "props": {
+                    "className": "en-code",
+                    "children": "inset-inline-start"
+                  },
+                  "_owner": null,
+                  "_store": {}
+                },
+                "."
+              ]
+            },
+            "_owner": null,
+            "_store": {}
+          },
+          "documentationId": 3
+        }
+      ]
+    },
+    {
+      "fileName": "App.js",
+      "path": "src0/App.js",
+      "fileType": "jsx",
+      "score": 90,
+      "issues": [
+        {
+          "type": "HTML Structure",
+          "severity": "warning",
+          "message": {
+            "key": null,
+            "props": {
+              "children": [
+                "We couldn't find a ",
+                {
+                  "type": "span",
+                  "key": null,
+                  "props": {
+                    "className": "en-code",
+                    "children": "<footer>"
+                  },
+                  "_owner": null,
+                  "_store": {}
+                },
+                " tag in the entire project. (Global Check)"
+              ]
+            },
+            "_owner": null,
+            "_store": {}
+          },
+          "documentationId": 1
+        }
+      ]
+    },
+    {
+      "fileName": "index.js",
+      "path": "src0/index.js",
+      "fileType": "jsx",
+      "score": 100,
+      "issues": []
+    },
+    {
+      "fileName": "UserCard.js",
+      "path": "src0/components/UserCard.js",
+      "fileType": "jsx",
+      "score": 95,
+      "issues": [
+        {
+          "type": "RTL Styling",
+          "severity": "warning",
+          "message": {
+            "key": null,
+            "props": {
+              "children": [
+                "Avoid physical property ",
+                {
+                  "type": "span",
+                  "key": null,
+                  "props": {
+                    "className": "en-code",
+                    "children": [
+                      "'",
+                      "marginRight",
+                      "'"
+                    ]
+                  },
+                  "_owner": null,
+                  "_store": {}
+                },
+                ". Use logical properties (e.g., marginInlineStart)."
+              ]
+            },
+            "_owner": null,
+            "_store": {}
+          },
+          "documentationId": 3
+        }
+      ]
+    }
+  ]
+}

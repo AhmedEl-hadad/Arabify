@@ -66,6 +66,10 @@
 - **Codebase Refactoring**:
   - Analyzers moved to `src/services` for better separation of concerns.
   - Standardized component naming (`SplitText.js`).
+- **Reporting & Scoring**:
+  - **JSON Reports**: Download detailed analysis reports with standardized English keys, regardless of UI language.
+  - **Weighted Scoring**: "Main files" (App.js, index.html) now carry 2x weight to prioritize core architectural patterns.
+  - **Visual Scorecard**: New circular progress indicator for immediate score visibility.
 
 ![Analysis Example](assets/warnings-example.png)
 

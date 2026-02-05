@@ -1,13 +1,13 @@
 import React, { useState, useContext } from 'react';
 import './ConfigWizard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faMagic, faGlobe, faTimes, faCode } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faMagic, faGlobe, faTimes, faCode, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { faReact } from '@fortawesome/free-brands-svg-icons';
 import { LanguageContext } from '../contexts/LanguageContext';
 
 const ConfigWizard = ({ onStart, onCancel }) => {
     const { text } = useContext(LanguageContext);
-    const [mode, setMode] = useState('scan'); // 'scan', 'fix', 'multi-lang'
+    const [mode, setMode] = useState('fix-all'); // 'scan', 'fix-css', 'fix-lang', 'fix-all'
     const [projectType, setProjectType] = useState('react'); // 'react', 'vanilla'
     const [appFileName, setAppFileName] = useState('App.js');
     const [htmlFileName, setHtmlFileName] = useState('index.html');
@@ -64,19 +64,29 @@ const ConfigWizard = ({ onStart, onCancel }) => {
                         </div>
 
                         <div
-                            className={`mode-option ${mode === 'fix' ? 'selected' : ''}`}
-                            onClick={() => setMode('fix')}
+                            className={`mode-option ${mode === 'fix-css' ? 'selected' : ''}`}
+                            onClick={() => setMode('fix-css')}
                         >
                             <FontAwesomeIcon icon={faMagic} className="mode-icon" />
-                            <span className="mode-label">{text.modeFix}</span>
+                            <span className="mode-label">{text.modeFixCSS}</span>
+                        </div>
+
+                         <div
+                            className={`mode-option ${mode === 'fix-lang' ? 'selected' : ''}`}
+                             onClick={() => setMode('fix-lang')}
+                             style={{ opacity: projectType === 'vanilla' ? 0.5 : 1, pointerEvents: projectType === 'vanilla' ? 'none' : 'auto' }}
+                        >
+                            <FontAwesomeIcon icon={faGlobe} className="mode-icon" />
+                            <span className="mode-label">{text.modeFixLang}</span>
                         </div>
 
                         <div
-                            className={`mode-option ${mode === 'multi-lang' ? 'selected' : ''}`}
-                            onClick={() => setMode('multi-lang')}
+                            className={`mode-option ${mode === 'fix-all' ? 'selected' : ''}`}
+                            onClick={() => setMode('fix-all')}
+                             style={{ opacity: projectType === 'vanilla' ? 0.5 : 1, pointerEvents: projectType === 'vanilla' ? 'none' : 'auto' }}
                         >
-                            <FontAwesomeIcon icon={faGlobe} className="mode-icon" />
-                            <span className="mode-label">{text.modeMultiLang}</span>
+                            <FontAwesomeIcon icon={faCheck} className="mode-icon" />
+                            <span className="mode-label">{text.modeFixAll}</span>
                         </div>
                     </div>
                 </div>

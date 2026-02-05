@@ -31,17 +31,17 @@ const analyzeHTML = (htmlString, text, options = { isMainFile: true, checkStruct
     // Check for Semantic Tags
     if (!doc.querySelector("header")) {
       score -= 20;
-      warnings.push({ type: text.errtypeStructure, msg: text.msgMissingHeader, blogID: 1 });
+      warnings.push({ type: "errtypeStructure", code: "MISSING_HEADER", blogID: 1 });
     }
 
     if (!doc.querySelector("nav")) {
       score -= 20;
-      warnings.push({ type: text.errtypeStructure, msg: text.msgMissingNav, blogID: 1 });
+      warnings.push({ type: "errtypeStructure", code: "MISSING_NAV", blogID: 1 });
     }
 
     if (!doc.querySelector("footer")) {
       score -= 20;
-      warnings.push({ type: text.errtypeStructure, msg: text.msgMissingFooter, blogID: 1 });
+      warnings.push({ type: "errtypeStructure", code: "MISSING_FOOTER", blogID: 1 });
     }
   }
 
@@ -51,45 +51,44 @@ const analyzeHTML = (htmlString, text, options = { isMainFile: true, checkStruct
     // Check Charset
     if (!doc.querySelector("meta[charset]")) {
       score -= 5;
-      warnings.push({ type: text.errtypeMeta, msg: text.msgMissingMetaCharset, blogID: 6 });
+      warnings.push({ type: "errtypeMeta", code: "MISSING_META_CHARSET", blogID: 6 });
     }
 
     // Check Viewport
     if (!doc.querySelector('meta[name="viewport"]')) {
       score -= 5;
-      warnings.push({ type: text.errtypeMeta, msg: text.msgMissingMetaViewport, blogID: 6 });
+      warnings.push({ type: "errtypeMeta", code: "MISSING_META_VIEWPORT", blogID: 6 });
     }
 
     // Check Description
     if (!doc.querySelector('meta[name="description"]')) {
       score -= 5;
-      warnings.push({ type: text.errtypeMeta, msg: text.msgMissingMetaDescription, blogID: 6 });
+      warnings.push({ type: "errtypeMeta", code: "MISSING_META_DESCRIPTION", blogID: 6 });
     }
 
     // Check Keywords
     if (!doc.querySelector('meta[name="keywords"]')) {
       score -= 5;
-      warnings.push({ type: text.errtypeMeta, msg: text.msgMissingMetaKeywords, blogID: 6 });
+      warnings.push({ type: "errtypeMeta", code: "MISSING_META_KEYWORDS", blogID: 6 });
     }
 
     // Check Author
     if (!doc.querySelector('meta[name="author"]')) {
       score -= 5;
-      warnings.push({ type: text.errtypeMeta, msg: text.msgMissingMetaAuthor, blogID: 6 });
+      warnings.push({ type: "errtypeMeta", code: "MISSING_META_AUTHOR", blogID: 6 });
     }
 
     // --- LANG ATTRIBUTE CHECK ---
 
     // This checks the <html lang="..."> attribute specifically
-    const htmlTag = doc.documentElement; // This gets the <html> tag
-    if (!htmlTag.hasAttribute("lang")) {
+    if (!doc.documentElement.getAttribute("lang")) {
       score -= 5;
-      warnings.push({ type: text.errtypeLanguage, msg: text.msgMissingLangAttribute, blogID: 5 });
+      warnings.push({ type: "errtypeLanguage", code: "MISSING_LANG_ATTRIBUTE", blogID: 5 });
     }
 
-    if (!htmlTag.hasAttribute("dir")) {
+    if (!doc.documentElement.getAttribute("dir")) {
       score -= 5;
-      warnings.push({ type: text.errtypeLanguage, msg: text.msgMissingDirAttribute, blogID: 5 });
+      warnings.push({ type: "errtypeLanguage", code: "MISSING_DIR_ATTRIBUTE", blogID: 5 });
     }
   }
 
@@ -100,11 +99,10 @@ const analyzeHTML = (htmlString, text, options = { isMainFile: true, checkStruct
     if (!img.hasAttribute("alt")) {
       score -= 5;
 
-      let finalMessage = text.msgMissingAlt(index + 1);
-
       warnings.push({
-        type: text.errtypeAlt,
-        msg: finalMessage,
+        type: "errtypeAlt",
+        code: "MISSING_ALT",
+        args: [index + 1],
         blogID: 2
       });
     }

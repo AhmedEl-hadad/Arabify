@@ -5,9 +5,10 @@ import safeParser from 'postcss-safe-parser';
  * Analyzes CSS code for RTL compatibility, responsiveness, and best practices.
  * @param {string} cssString - The CSS code to analyze.
  * @param {object} text - The localization object containing error messages and labels.
+ * @param {object} options - Options like isMainFile.
  * @returns {Promise<object>} Result object containing score, warnings, and fixedCSS.
  */
-const analyzeCSS = async (cssString, text) => {
+const analyzeCSS = async (cssString, text, options = {}) => {
   let score = 100;
   let warnings = [];
 
@@ -16,131 +17,126 @@ const analyzeCSS = async (cssString, text) => {
     Declaration(decl) {
       // --- RTL FIXES ---
 
-      // Margins
-      if (decl.prop === 'margin-left') {
-        decl.prop = 'margin-inline-start';
-        score -= 5;
-        warnings.push({ type: text.errtypeRTL, msg: text.fixMarginLeft, blogID: 3 });
-      } else if (decl.prop === 'margin-right') {
-        decl.prop = 'margin-inline-end';
-        score -= 5;
-        warnings.push({ type: text.errtypeRTL, msg: text.fixMarginRight, blogID: 3 });
-      }
-
-      // Paddings
-      else if (decl.prop === 'padding-left') {
-        decl.prop = 'padding-inline-start';
-        score -= 5;
-        warnings.push({ type: text.errtypeRTL, msg: text.fixPaddingLeft, blogID: 3 });
-      } else if (decl.prop === 'padding-right') {
-        decl.prop = 'padding-inline-end';
-        score -= 5;
-        warnings.push({ type: text.errtypeRTL, msg: text.fixPaddingRight, blogID: 3 });
-      }
-
-      // Borders (Physical -> Logical)
-      else if (decl.prop === 'border-left') {
-        decl.prop = 'border-inline-start';
-        score -= 5;
-        warnings.push({ type: text.errtypeRTL, msg: text.fixBorderLeft, blogID: 3 });
-      } else if (decl.prop === 'border-right') {
-        decl.prop = 'border-inline-end';
-        score -= 5;
-        warnings.push({ type: text.errtypeRTL, msg: text.fixBorderRight, blogID: 3 });
-      }
-
-      // Text Align
-      else if (decl.prop === 'text-align') {
-        if (decl.value === 'left') {
-          decl.value = 'start';
+      // 1. Text Align
+      if (decl.prop === 'text-align') {
+        if (decl.value === 'left' || decl.value === 'right') {
           score -= 5;
-          warnings.push({ type: text.errtypeRTL, msg: text.fixTextAlign, blogID: 7 });
-        } else if (decl.value === 'right') {
-          decl.value = 'end';
-          score -= 5;
-          warnings.push({ type: text.errtypeRTL, msg: text.fixTextAlign, blogID: 7 });
+          // Different code/severity could be used here if needed, but for now using FIX_TEXT_ALIGN
+          // Note: If isMainFile is true, we might auto-fix (modify decl.value).
+          // For the analyzer report, we just flag it.
+          // If we want to support auto-fix behavior visible in the "Fixed Code" window:
+          if (options.isMainFile) {
+             decl.value = decl.value === 'left' ? 'start' : 'end';
+          }
+          
+          warnings.push({ 
+            type: "errtypeRTL", 
+            code: "FIX_TEXT_ALIGN", 
+            blogID: 7 
+          });
         }
       }
 
-      // Float
+      // 2. Float
       else if (decl.prop === 'float') {
-        if (decl.value === 'left') {
-          decl.value = 'inline-start';
+        if (decl.value === 'left' || decl.value === 'right') {
           score -= 5;
-          warnings.push({ type: text.errtypeRTL, msg: text.fixFloat, blogID: 7 });
-        } else if (decl.value === 'right') {
-          decl.value = 'inline-end';
-          score -= 5;
-          warnings.push({ type: text.errtypeRTL, msg: text.fixFloat, blogID: 7 });
+          if (options.isMainFile) {
+            decl.value = decl.value === 'left' ? 'inline-start' : 'inline-end';
+          }
+          warnings.push({ 
+            type: "errtypeRTL", 
+            code: "FIX_FLOAT", 
+            blogID: 7 
+          });
         }
       }
 
-      // Specific Corners (Physical -> Logical)
-      else if (decl.prop === 'border-top-left-radius') {
-        decl.prop = 'border-start-start-radius';
+      // 3. Physical Properties (Margins, Paddings, Borders, Position)
+      const physicalMap = {
+        'margin-left': { logical: 'margin-inline-start', code: 'FIX_MARGIN_LEFT' },
+        'margin-right': { logical: 'margin-inline-end', code: 'FIX_MARGIN_RIGHT' },
+        'padding-left': { logical: 'padding-inline-start', code: 'FIX_PADDING_LEFT' },
+        'padding-right': { logical: 'padding-inline-end', code: 'FIX_PADDING_RIGHT' },
+        'border-left': { logical: 'border-inline-start', code: 'FIX_BORDER_LEFT' },
+        'border-right': { logical: 'border-inline-end', code: 'FIX_BORDER_RIGHT' },
+        'left': { logical: 'inset-inline-start', code: 'FIX_LEFT_POSITION' },
+        'right': { logical: 'inset-inline-end', code: 'FIX_RIGHT_POSITION' },
+        'border-top-left-radius': { logical: 'border-start-start-radius', code: 'FIX_BORDER_TOP_LEFT_RADIUS' },
+        'border-top-right-radius': { logical: 'border-start-end-radius', code: 'FIX_BORDER_TOP_RIGHT_RADIUS' },
+        'border-bottom-right-radius': { logical: 'border-end-end-radius', code: 'FIX_BORDER_BOTTOM_RIGHT_RADIUS' },
+        'border-bottom-left-radius': { logical: 'border-end-start-radius', code: 'FIX_BORDER_BOTTOM_LEFT_RADIUS' },
+      };
+
+      if (physicalMap[decl.prop]) {
         score -= 5;
-        warnings.push({ type: text.errtypeRTL, msg: text.fixBorderTopLeftRadius, blogID: 3 });
-      } else if (decl.prop === 'border-top-right-radius') {
-        decl.prop = 'border-start-end-radius';
-        score -= 5;
-        warnings.push({ type: text.errtypeRTL, msg: text.fixBorderTopRightRadius, blogID: 3 });
-      } else if (decl.prop === 'border-bottom-right-radius') {
-        decl.prop = 'border-end-end-radius';
-        score -= 5;
-        warnings.push({ type: text.errtypeRTL, msg: text.fixBorderBottomRightRadius, blogID: 3 });
-      } else if (decl.prop === 'border-bottom-left-radius') {
-        decl.prop = 'border-end-start-radius';
-        score -= 5;
-        warnings.push({ type: text.errtypeRTL, msg: text.fixBorderBottomLeftRadius, blogID: 3 });
+        const entry = physicalMap[decl.prop];
+        if (options.isMainFile) {
+          decl.prop = entry.logical;
+        }
+        warnings.push({ 
+          type: "errtypeRTL", 
+          code: entry.code, 
+          blogID: 3 
+        });
       }
 
-      // Shorthand Explosion (border-radius: tl tr br bl)
+      // 4. Border Radius Shorthand (4 values)
       else if (decl.prop === 'border-radius') {
         const parts = postcss.list.space(decl.value);
         if (parts.length === 4) {
-          const [tl, tr, br, bl] = parts;
-          decl.replaceWith(
-            { prop: 'border-start-start-radius', value: tl },
-            { prop: 'border-start-end-radius', value: tr },
-            { prop: 'border-end-end-radius', value: br },
-            { prop: 'border-end-start-radius', value: bl }
-          );
           score -= 5;
+          if (options.isMainFile) {
+            const [tl, tr, br, bl] = parts;
+            decl.replaceWith(
+              { prop: 'border-start-start-radius', value: tl },
+              { prop: 'border-start-end-radius', value: tr },
+              { prop: 'border-end-end-radius', value: br },
+              { prop: 'border-end-start-radius', value: bl }
+            );
+          }
           warnings.push({
-            type: text.errtypeRTL,
-            msg: text.fixBorderRadiusShorthand,
+            type: "errtypeRTL",
+            code: "FIX_BORDER_RADIUS_SHORTHAND",
             blogID: 3
           });
         }
       }
 
-      // Positioning (left/right -> inset-inline-start/end)
-      else if (decl.prop === 'left') {
-        decl.prop = 'inset-inline-start';
-        score -= 5;
-        warnings.push({ type: text.errtypeRTL, msg: text.fixLeftPosition, blogID: 3 });
-      } else if (decl.prop === 'right') {
-        decl.prop = 'inset-inline-end';
-        score -= 5;
-        warnings.push({ type: text.errtypeRTL, msg: text.fixRightPosition, blogID: 3 });
+      // 5. Pixel Check
+      if (decl.value && decl.value.includes('px')) {
+         // Regex to find number before px
+         const pxMatches = decl.value.match(/(\d*\.?\d+)px/g);
+         if (pxMatches) {
+            const hasLargePixels = pxMatches.some(match => parseFloat(match) > 10);
+            if (hasLargePixels) {
+               // Deduplicate warnings slightly by checking if strict dupes exist? 
+               // Or just allow one per file?
+              if (decl.prop === 'width' && decl.value.endsWith('px')) {
+            const val = parseFloat(decl.value);
+            if (val > 300) { // arbitrary threshold for "large" px widths
+                score -= 2;
+                warnings.push({
+                    type: "errtypeResponsiveness",
+                    code: "AVOID_LARGE_PX_WIDTH",
+                    args: [decl.value],
+                    blogID: 0
+                });
+            }
+        }
+               const alreadyWarned = warnings.some(w => w.code === "WARN_PX");
+               if (!alreadyWarned) {
+                  score -= 1;
+                  warnings.push({
+                    type: "errtypeResponsiveness",
+                    code: "WARN_PX",
+                    blogID: 4
+                  });
+               }
+            }
+         }
       }
 
-      // --- PIXEL UNIT CHECK ---
-      // Check for pixel values > 10px in any declaration value
-      const pxMatches = decl.value.match(/(\d*\.?\d+)px/g);
-      if (pxMatches) {
-        const hasLargePixels = pxMatches.some(match => parseFloat(match) > 10);
-        if (hasLargePixels) {
-          // We only want to warn once per file ideally, or maybe per declaration?
-          // The previous logic warned once if ANY large pixel was found.
-          // Let's check if we already have this warning.
-          const alreadyWarned = warnings.some(w => w.type === text.errtypeResponsiveness && w.msg === text.warnPx);
-          if (!alreadyWarned) {
-            score -= 5;
-            warnings.push({ type: text.errtypeResponsiveness, msg: text.warnPx, blogID: 4 });
-          }
-        }
-      }
     }
   };
 

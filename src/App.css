@@ -15,6 +15,10 @@
   --border-glass: rgba(255, 255, 255, 0.1);
   --bg-glass-hover: rgba(255, 255, 255, 0.1);
   --border-glass-hover: rgba(255, 255, 255, 0.2);
+  --bg-code: #1e1e1e;
+  --bg-code-header: #252526;
+  --code-font: 'Consolas', 'Monaco', 'Courier New', monospace;
+  --shadow-heavy: 0 1.25rem 3.125rem rgba(0, 0, 0, 0.5);
 }
 
 :root:lang(ar) {
@@ -46,6 +50,33 @@ section {
 body {
   min-height: 100vh;
   background-color: var(--dark);
+}
+
+/* Global Scrollbar */
+::-webkit-scrollbar {
+  width: 8px; /* Standard width, not too thin */
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  margin-block: 0.5rem; /* Makes the scrollbar "shorter" (margins at top/bottom) */
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  border: 2px solid transparent; /* Makes thumb look floating/smaller inside */
+  background-clip: content-box;
+  transition: background-color 0.3s;
+}
+
+/* Show scrollbar when hovering the scrollable element */
+*:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--accent-color) !important;
 }
 
 .App {
@@ -117,7 +148,15 @@ nav a {
 }
 
 nav a:hover {
-  background-color: var(--accent-color)
+  background-color: var(--accent-color);
+  box-shadow: 0 0 15px rgba(255, 95, 86, 0.3);
+  transform: translateY(-2px);
+}
+
+nav .logo:hover {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 nav .logo {
@@ -278,6 +317,8 @@ p {
 .btn:hover {
   background-color: var(--accent-shade);
   border-color: var(--dark);
+  box-shadow: 0 0 15px rgba(255, 95, 86, 0.3);
+  transform: translateY(-2px);
 }
 
 .btn .icons-end {
@@ -713,6 +754,8 @@ a.fix-link,
     background: var(--accent-color);
     border-color: var(--accent-color);
     color: white;
+    box-shadow: 0 0 15px rgba(255, 95, 86, 0.3);
+    transform: translateY(-2px);
 }
 
 .section-header {
@@ -756,4 +799,59 @@ a.fix-link,
     background: var(--accent-color);
     border-color: var(--accent-color);
     color: white;
+    box-shadow: 0 0 15px rgba(255, 95, 86, 0.3);
+    transform: translateY(-2px);
+}
+
+/* --- PROJECT SCORECARD --- */
+.project-score-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  animation: fadeIn 1s ease forwards;
+}
+
+.score-title {
+  color: var(--bright);
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  font-family: var(--btn-font);
+  opacity: 0.9;
+}
+
+.circular-chart {
+  display: block;
+  margin: 0 auto;
+  max-width: 80%;
+  max-height: 250px;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 2.5; 
+}
+
+.circle {
+  fill: none;
+  stroke-width: 2.5; 
+  stroke-linecap: round;
+  animation: progress 1.5s ease-out forwards;
+  transform: rotate(-90deg); /* Start from top */
+  transform-origin: 50% 50%; /* Rotate around center */
+}
+
+.percentage-text {
+  fill: var(--bright);
+  font-family: var(--font-en);
+  font-weight: bold;
+  font-size: 0.6em; /* Relative to SVG viewBox units */
+  text-anchor: middle;
+}
+
+@keyframes progress {
+  0% { stroke-dasharray: 0, 100; }
 }
