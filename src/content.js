@@ -24,6 +24,8 @@ export const content = {
     uploadFolder: "Upload Folder",
     upload: "Upload",
     files: "Files",
+    dragHint: "Drag & drop files or folders anywhere here",
+    supportedTypes: "Supported: .html, .css, .js, .jsx, images",
 
     // Wizard
     wizardTitle: "Analysis Configuration",
@@ -55,6 +57,7 @@ export const content = {
     msgMissingNav: <>We couldn't find a <span className="en-code">&lt;nav&gt;</span> tag. Consider replacing <span className="en-code">&lt;div className='nav'&gt;</span> with <span className="en-code">&lt;nav&gt;</span>.</>,
     msgMissingFooter: <>We couldn't find a <span className="en-code">&lt;footer&gt;</span> tag. Consider adding one for better structure.</>,
     msgMissingMain: <>We couldn't find a <span className="en-code">&lt;main&gt;</span> tag. Consider wrapping your main content in <span className="en-code">&lt;main&gt;</span>.</>,
+    msgGlobalMissingTag: (tag) => <>We couldn't find a <span className="en-code">{tag}</span> tag in the entire project. (Global Check)</>,
 
     // FUNCTION: Dynamic ID
     msgMissingAlt: (id) => <>Image <span className="en-code">#{id}</span> is missing an 'alt' attribute.</>,
@@ -78,21 +81,22 @@ export const content = {
 
     // --- CSS WARNINGS ---
     fixScroll: <>Added <span className="en-code">scroll-behavior: smooth</span> to html for better user experience.</>,
-    fixMarginLeft: <>Replaced <span className="en-code">margin-left</span> with <span className="en-code">margin-inline-start</span> to automatically flip spacing in RTL mode.</>,
-    fixMarginRight: <>Replaced <span className="en-code">margin-right</span> with <span className="en-code">margin-inline-end</span> to automatically flip spacing in RTL mode.</>,
-    fixPaddingLeft: <>Replaced <span className="en-code">padding-left</span> with <span className="en-code">padding-inline-start</span> to support RTL.</>,
-    fixPaddingRight: <>Replaced <span className="en-code">padding-right</span> with <span className="en-code">padding-inline-end</span> to support RTL.</>,
-    fixTextAlign: <>Replaced <span className="en-code">text-align: left/right</span> with <span className="en-code">start/end</span> so text aligns correctly in Arabic.</>,
+    fixMarginLeft: <>Found physical property <span className="en-code">margin-left</span>. Use <span className="en-code">margin-inline-start</span> for RTL support.</>,
+    fixMarginRight: <>Found physical property <span className="en-code">margin-right</span>. Use <span className="en-code">margin-inline-end</span> for RTL support.</>,
+    fixPaddingLeft: <>Found physical property <span className="en-code">padding-left</span>. Use <span className="en-code">padding-inline-start</span> for RTL support.</>,
+    fixPaddingRight: <>Found physical property <span className="en-code">padding-right</span>. Use <span className="en-code">padding-inline-end</span> for RTL support.</>,
+    fixTextAlign: <>Found hardcoded <span className="en-code">text-align</span>. Use <span className="en-code">start/end</span> to align correctly in Arabic.</>,
+    fixFloat: <>Found physical float. Use <span className="en-code">inline-start/inline-end</span>.</>,
     warnPx: <>Found fixed <span className="en-code">px</span> values larger than 10px. Use <span className="en-code">rem</span> for fonts and spacing.</>,
-    fixBorderLeft: <>Replaced <span className="en-code">border-left</span> with <span className="en-code">border-inline-start</span>.</>,
-    fixBorderRight: <>Replaced <span className="en-code">border-right</span> with <span className="en-code">border-inline-end</span>.</>,
-    fixBorderTopLeftRadius: <>Fixed <span className="en-code">border-top-left-radius</span> to logical <span className="en-code">border-start-start-radius</span>.</>,
-    fixBorderTopRightRadius: <>Fixed <span className="en-code">border-top-right-radius</span> to logical <span className="en-code">border-start-end-radius</span>.</>,
-    fixBorderBottomRightRadius: <>Fixed <span className="en-code">border-bottom-right-radius</span> to logical <span className="en-code">border-end-end-radius</span>.</>,
-    fixBorderBottomLeftRadius: <>Fixed <span className="en-code">border-bottom-left-radius</span> to logical <span className="en-code">border-end-start-radius</span>.</>,
-    fixBorderRadiusShorthand: <>Converted physical <span className="en-code">border-radius</span> shorthand to logical properties.</>,
-    fixLeftPosition: <>Fixed absolute positioning <span className="en-code">left</span> to <span className="en-code">inset-inline-start</span>.</>,
-    fixRightPosition: <>Fixed absolute positioning <span className="en-code">right</span> to <span className="en-code">inset-inline-end</span>.</>,
+    fixBorderLeft: <>Found physical <span className="en-code">border-left</span>. Use <span className="en-code">border-inline-start</span>.</>,
+    fixBorderRight: <>Found physical <span className="en-code">border-right</span>. Use <span className="en-code">border-inline-end</span>.</>,
+    fixBorderTopLeftRadius: <>Found physical <span className="en-code">border-top-left-radius</span>. Use <span className="en-code">border-start-start-radius</span>.</>,
+    fixBorderTopRightRadius: <>Found physical <span className="en-code">border-top-right-radius</span>. Use <span className="en-code">border-start-end-radius</span>.</>,
+    fixBorderBottomRightRadius: <>Found physical <span className="en-code">border-bottom-right-radius</span>. Use <span className="en-code">border-end-end-radius</span>.</>,
+    fixBorderBottomLeftRadius: <>Found physical <span className="en-code">border-bottom-left-radius</span>. Use <span className="en-code">border-end-start-radius</span>.</>,
+    fixBorderRadiusShorthand: <>Found physical <span className="en-code">border-radius</span> shorthand. Use logical properties.</>,
+    fixLeftPosition: <>Found physical positioning <span className="en-code">left</span>. Use <span className="en-code">inset-inline-start</span>.</>,
+    fixRightPosition: <>Found physical positioning <span className="en-code">right</span>. Use <span className="en-code">inset-inline-end</span>.</>,
 
     // New Blog Specific Labels
     blogSubtitle: "Your comprehensive guide to Accessibility, RTL support, and Modern CSS.",
@@ -196,6 +200,8 @@ export const content = {
     uploadFolder: "رفع مجلد",
     upload: "رفع",
     files: "ملفات",
+    dragHint: "اسحب وأفلت الملفات أو المجلدات هنا",
+    supportedTypes: "ندعم: .html, .css, .js, .jsx, والصور",
 
     // Wizard
     wizardTitle: "إعدادات التحليل",
@@ -226,6 +232,7 @@ export const content = {
     msgMissingNav: <>لم نتمكن من العثور على وسم <span className="en-code">&lt;nav&gt;</span>. فكر في استبدال <span className="en-code">&lt;div className='nav'&gt;</span> بـ <span className="en-code">&lt;nav&gt;</span>.</>,
     msgMissingFooter: <>لم نتمكن من العثور على وسم <span className="en-code">&lt;footer&gt;</span>. فكر في إضافة واحد لتحسين الهيكلية.</>,
     msgMissingMain: <>لم نتمكن من العثور على وسم <span className="en-code">&lt;main&gt;</span>. فكر في تغليف المحتوى الرئيسي بـ <span className="en-code">&lt;main&gt;</span>.</>,
+    msgGlobalMissingTag: (tag) => <>لم نتمكن من العثور على وسم <span className="en-code">{tag}</span> في المشروع بالكامل. (فحص شامل)</>,
 
     // FUNCTION
     msgMissingAlt: (id) => <>الصورة رقم <span className="en-code">#{id}</span> تفتقد وسم <span className="en-code">alt</span>.</>,
@@ -249,21 +256,22 @@ export const content = {
 
     // --- CSS WARNINGS ---
     fixScroll: <>تم إضافة <span className="en-code">scroll-behavior: smooth</span> لتحسين تجربة التمرير.</>,
-    fixMarginLeft: <>تم استبدال <span className="en-code">margin-left</span> بـ <span className="en-code">margin-inline-start</span> لقلب المسافات تلقائياً في العربية.</>,
-    fixMarginRight: <>تم استبدال <span className="en-code">margin-right</span> بـ <span className="en-code">margin-inline-end</span> لقلب المسافات تلقائياً في العربية.</>,
-    fixPaddingLeft: <>تم استبدال <span className="en-code">padding-left</span> بـ <span className="en-code">padding-inline-start</span> لدعم الاتجاهين.</>,
-    fixPaddingRight: <>تم استبدال <span className="en-code">padding-right</span> بـ <span className="en-code">padding-inline-end</span> لدعم الاتجاهين.</>,
-    fixTextAlign: <>تم استبدال <span className="en-code">text-align</span> بـ <span className="en-code">start/end</span> لضمان محاذاة النص بشكل صحيح.</>,
+    fixMarginLeft: <>تم العثور على <span className="en-code">margin-left</span>. استخدم <span className="en-code">margin-inline-start</span> لدعم العربية.</>,
+    fixMarginRight: <>تم العثور على <span className="en-code">margin-right</span>. استخدم <span className="en-code">margin-inline-end</span> لدعم العربية.</>,
+    fixPaddingLeft: <>تم العثور على <span className="en-code">padding-left</span>. استخدم <span className="en-code">padding-inline-start</span> لدعم العربية.</>,
+    fixPaddingRight: <>تم العثور على <span className="en-code">padding-right</span>. استخدم <span className="en-code">padding-inline-end</span> لدعم العربية.</>,
+    fixTextAlign: <>تم العثور على <span className="en-code">text-align</span> ثابت. استخدم <span className="en-code">start/end</span> لضمان المحاذاة الصحيحة.</>,
+    fixFloat: <>تم العثور على <span className="en-code">float</span> مادي. استخدم <span className="en-code">inline-start/inline-end</span>.</>,
     warnPx: <>تم العثور على قيم <span className="en-code">px</span> أكبر من 10px. استخدم <span className="en-code">rem</span> للخطوط والمسافات.</>,
-    fixBorderLeft: <>تم استبدال <span className="en-code">border-left</span> بـ <span className="en-code">border-inline-start</span>.</>,
-    fixBorderRight: <>تم استبدال <span className="en-code">border-right</span> بـ <span className="en-code">border-inline-end</span>.</>,
-    fixBorderTopLeftRadius: <>تم إصلاح <span className="en-code">border-top-left-radius</span> إلى <span className="en-code">border-start-start-radius</span> المنطقي.</>,
-    fixBorderTopRightRadius: <>تم إصلاح <span className="en-code">border-top-right-radius</span> إلى <span className="en-code">border-start-end-radius</span> المنطقي.</>,
-    fixBorderBottomRightRadius: <>تم إصلاح <span className="en-code">border-bottom-right-radius</span> إلى <span className="en-code">border-end-end-radius</span> المنطقي.</>,
-    fixBorderBottomLeftRadius: <>تم إصلاح <span className="en-code">border-bottom-left-radius</span> إلى <span className="en-code">border-end-start-radius</span> المنطقي.</>,
-    fixBorderRadiusShorthand: <>تم تحويل اختصار <span className="en-code">border-radius</span> المادي إلى خصائص منطقية.</>,
-    fixLeftPosition: <>تم إصلاح التموضع المطلق <span className="en-code">left</span> إلى <span className="en-code">inset-inline-start</span>.</>,
-    fixRightPosition: <>تم إصلاح التموضع المطلق <span className="en-code">right</span> إلى <span className="en-code">inset-inline-end</span>.</>,
+    fixBorderLeft: <>تم العثور على <span className="en-code">border-left</span> مادي. استخدم <span className="en-code">border-inline-start</span>.</>,
+    fixBorderRight: <>تم العثور على <span className="en-code">border-right</span> مادي. استخدم <span className="en-code">border-inline-end</span>.</>,
+    fixBorderTopLeftRadius: <>تم العثور على <span className="en-code">border-top-left-radius</span> مادي. استخدم <span className="en-code">border-start-start-radius</span>.</>,
+    fixBorderTopRightRadius: <>تم العثور على <span className="en-code">border-top-right-radius</span> مادي. استخدم <span className="en-code">border-start-end-radius</span>.</>,
+    fixBorderBottomRightRadius: <>تم العثور على <span className="en-code">border-bottom-right-radius</span> مادي. استخدم <span className="en-code">border-end-end-radius</span>.</>,
+    fixBorderBottomLeftRadius: <>تم العثور على <span className="en-code">border-bottom-left-radius</span> مادي. استخدم <span className="en-code">border-end-start-radius</span>.</>,
+    fixBorderRadiusShorthand: <>تم العثور على اختصار <span className="en-code">border-radius</span> مادي. استخدم الخصائص المنطقية.</>,
+    fixLeftPosition: <>تم العثور على تموضع <span className="en-code">left</span>. استخدم <span className="en-code">inset-inline-start</span>.</>,
+    fixRightPosition: <>تم العثور على تموضع <span className="en-code">right</span>. استخدم <span className="en-code">inset-inline-end</span>.</>,
 
     // New Blog Specific Labels
     blogSubtitle: "دليلك الشامل لتحسين تجربة المستخدم، دعم العربية، وسهولة الوصول.",

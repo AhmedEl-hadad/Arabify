@@ -45,18 +45,23 @@
 ### Version 0.3.0
 
 > [!TIP]
-> This release focuses on **Code Injection Intelligence**, **CSS Modernization**, and **RTL Stability**.
+> This release introduces a **Unified Upload Experience**, **Refined UI**, **Code Injection Intelligence**, and **CSS Modernization**.
 
 #### ⚡ New Features & Improvements
 
+- **Unified Upload & Drag-and-Drop**:
+  - **Unified Flow**: Removed dropdowns. Single, seamless drop zone for mixed files and folders.
+  - **Recursive Scanning**: Drag nested folders and files simultaneously; deep scans verify all content.
+  - **Accumulation**: Add files incrementally without clearing the previous selection.
+- **Visual Polish**:
+  - **Glassmorphism**: Consistent glass-effect styling across headers and inputs.
+  - **Descriptive Errors**: CSS warnings now say "Found X" (descriptive) instead of "Replaced X".
 - **Multi-Language & CSS Fixes**:
-  - **Auto-Fix Float**: Automatically converts `float: left` to `float: inline-start` and `float: right` to `float: inline-end`.
-  - **JSX Inline Style Fixes**: Now transforms inline style objects in JSX (e.g., `style={{ marginLeft: 10 }}`) to use logical properties (`marginInlineStart`).
-  - **Multi-Lang Integration**: CSS fixes are now automatically applied when running "Multi-Language Mode".
+  - **Auto-Fix Float**: Automatically converts `float: left` to `float: inline-start`.
+  - **JSX Inline Style Fixes**: Transforms inline styles in JSX to logical properties.
 - **Smart React Injection Engine**:
-  - **Dynamic Indentation**: Automatically detects and respects existing 2-space or 4-space indentation options.
+  - **Dynamic Indentation**: Automatically detects and respects existing 2-space or 4-space indentation.
   - **Smart Placement**: Intelligently places the `LanguageToggle` inside list items (`<li>`) if a list is detected within the `<nav>`.
-  - **Duplication Prevention**: Safely ignores `<header>` if a `Navbar` is present and performs robust AST checks to prevent double-injection.
   - **Header Fallback**: If no `<nav>` is found, strictly injects into `<header>` to ensure accessibility.
 - **Codebase Refactoring**:
   - Analyzers moved to `src/services` for better separation of concerns.

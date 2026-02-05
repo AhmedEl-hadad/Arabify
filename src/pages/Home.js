@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 import JSZip from 'jszip';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { contextTemplate, toggleTemplate } from '../utils/reactGenerators';
+import { scanFiles } from '../utils/fileScanner';
 
 const Home = () => {
     const { text, lang } = useContext(LanguageContext);
@@ -21,60 +22,117 @@ const Home = () => {
   const [results, setResults] = useState([]); // Array of { fileName, score, warnings, fixedCode, type }
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [confettiKey, setConfettiKey] = useState(0);
-  const [showUploadMenu, setShowUploadMenu] = useState(false);
-  const uploadMenuRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const folderInputRef = useRef(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   // Wizard State
   const [showWizard, setShowWizard] = useState(false);
   const [analysisConfig, setAnalysisConfig] = useState(null);
 
-  // Close upload menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (uploadMenuRef.current && !uploadMenuRef.current.contains(event.target)) {
-        setShowUploadMenu(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  // File Upload Logic
-  const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length === 0) return;
-    setShowUploadMenu(false);
-
-    // Promise based file reading
-    const readPromises = files.map(file => {
-      return new Promise((resolve) => {
-        let type = 'unknown';
-        if (file.name.endsWith('.css')) type = 'css';
-        else if (file.name.endsWith('.html')) type = 'html';
-        else if (file.name.endsWith('.jsx') || file.name.endsWith('.tsx') || file.name.endsWith('.js')) type = 'jsx';
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          resolve({
-            name: file.name,
-            path: file.webkitRelativePath || file.name, // Use relative path if available (folder upload)
-            content: event.target.result,
-            type: type,
-            originalFile: file // Keep original file for non-text/binary files if needed later
-          });
-        };
-        reader.readAsText(file);
-      });
-    });
-
-    Promise.all(readPromises).then(files => {
-      setUploadedFiles(files);
-      setResults([]); // Reset results
-      setAnalysisConfig(null); // Reset config on new upload
-    });
+  // Drag Handlers
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragOver(true);
   };
+    
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+    
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    // 1. Capture all entries SYNCHRONOUSLY
+    // accessing dataTransfer items must be done immediately
+    const items = Array.from(e.dataTransfer.items);
+    const entries = items.map(item => {
+        if (item.webkitGetAsEntry) {
+            return item.webkitGetAsEntry();
+        }
+        return null; // fallback or ignore
+    }).filter(entry => entry !== null);
+
+    // 2. Process entries ASYNCHRONOUSLY
+    // We can now safely await without losing the list
+    let allFiles = [];
+    const scanPromises = entries.map(entry => scanFiles(entry));
+    
+    try {
+        const results = await Promise.all(scanPromises);
+        allFiles = results.flat();
+        
+        if (allFiles.length > 0) {
+            addFiles(allFiles);
+        }
+    } catch (error) {
+        console.error("Error scanning dropped files:", error);
+    }
+  };
+
+  const handleFileUpload = (event) => {
+    if (event.target.files && event.target.files.length > 0) {
+        // Convert FileList to Array
+        const files = Array.from(event.target.files);
+        addFiles(files);
+    }
+  };
+  
+
+  const addFiles = async (newFiles) => {
+      // 1. Filter duplicates
+      const uniqueFiles = [];
+      setUploadedFiles(prev => {
+          const existingPaths = new Set(prev.map(f => f.path));
+          
+          for (const f of newFiles) {
+              const path = f.path || f.webkitRelativePath || f.name;
+               if (!existingPaths.has(path)) {
+                   // Patch path if missing (for direct file uploads)
+                   if (!f.path) f.path = path;
+                   uniqueFiles.push(f);
+                   existingPaths.add(path);
+               }
+          }
+          return prev; // Warning: we are not updating state here yet, we need to read them first
+      });
+
+      if (uniqueFiles.length === 0) return;
+
+      // 2. Read content
+      const readPromises = uniqueFiles.map(file => {
+          return new Promise((resolve) => {
+            let type = 'unknown';
+            if (file.name.endsWith('.css')) type = 'css';
+            else if (file.name.endsWith('.html')) type = 'html';
+            else if (file.name.endsWith('.jsx') || file.name.endsWith('.tsx') || file.name.endsWith('.js')) type = 'jsx';
+    
+            const reader = new FileReader();
+            reader.onload = (event) => {
+              resolve({
+                name: file.name,
+                path: file.path || file.webkitRelativePath || file.name, 
+                content: event.target.result,
+                type: type,
+                originalFile: file 
+              });
+            };
+            reader.readAsText(file);
+          });
+      });
+
+      const processedFiles = await Promise.all(readPromises);
+      
+      // 3. Update State
+      setUploadedFiles(prev => [...prev, ...processedFiles]);
+  };
+  
+  const handleUploadClick = () => {
+      fileInputRef.current.click();
+  };
+
 
   // Trigger Analysis (Shows Wizard First)
   const initiateAnalysis = () => {
@@ -175,9 +233,25 @@ const Home = () => {
             const finalTargetIndex = targetFileIndex !== -1 ? targetFileIndex : 0;
             
             if (newResults[finalTargetIndex]) {
+                // Deduplicate local warnings
+                missingTags.forEach(tag => {
+                   const localMsg = tag === '<header>' ? text.msgMissingHeader :
+                                    tag === '<footer>' ? text.msgMissingFooter :
+                                    tag === '<main>' ? text.msgMissingMain : null;
+                   
+                   if (localMsg) {
+                       const originalLength = newResults[finalTargetIndex].warnings.length;
+                       newResults[finalTargetIndex].warnings = newResults[finalTargetIndex].warnings.filter(w => w.msg !== localMsg);
+                       if (newResults[finalTargetIndex].warnings.length < originalLength) {
+                           // Refund the local penalty since we are replacing it with a global one
+                           newResults[finalTargetIndex].score += 5; 
+                       }
+                   }
+                });
+
                 const globalWarnings = missingTags.map(tag => ({
                     type: text.errtypeStructure,
-                    msg: `${text.errPreSemantic} ${tag} ${text.errPostSemantic} (Global Check)`,
+                    msg: text.msgGlobalMissingTag(tag),
                     blogID: 1
                 }));
                 
@@ -295,7 +369,14 @@ const Home = () => {
           </div>
         </section>
 
-        <section className="code-section" id="tool">
+        <section 
+          className={`code-section ${isDragOver ? 'drag-active' : ''}`} 
+          id="tool"
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          style={isDragOver ? { borderColor: 'var(--primary)', backgroundColor: 'var(--bg-card-hover)' } : {}}
+        >
           {/* THE CODE SECTION */}
           {uploadedFiles.length === 1 && (
             <div className="container">
@@ -326,56 +407,62 @@ const Home = () => {
           )}
 
           {/* UNIFIED UPLOAD BUTTON */}
-          <div className="upload-container" ref={uploadMenuRef}>
+          {/* UNIFIED UPLOAD BUTTON */}
+          {/* UNIFIED DROP ZONE UI */}
 
-            <button
-              className="btn upload-btn-main"
-              onClick={() => setShowUploadMenu(!showUploadMenu)}
-            >
-              <span>
-                <FontAwesomeIcon icon={uploadedFiles.length > 0 ? faCheck : faUpload} className="icons-end" />
-                {uploadedFiles.length > 0 ? `${uploadedFiles.length} ${text.files}` : (text.upFile || text.upload)}
-              </span>
-              <FontAwesomeIcon icon={faChevronDown} />
-            </button>
+          {/* PERSISTENT HIDDEN INPUTS */}
+           <input
+                type="file"
+                multiple
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={handleFileUpload}
+            />
+            <input
+                type="file"
+                webkitdirectory=""
+                directory=""
+                multiple
+                ref={folderInputRef}
+                style={{ display: "none" }}
+                onChange={handleFileUpload}
+            />
 
-            {showUploadMenu && (
-              <div className="upload-dropdown">
-                {/* FILE UPLOAD OPTION */}
-                <div>
-                  <input
-                    type="file"
-                    id="file-upload-single"
-                    onChange={handleFileUpload}
-                    style={{ display: 'none' }}
-                    multiple
-                  />
-                  <label htmlFor="file-upload-single" className="upload-option">
-                    <FontAwesomeIcon icon={faFile} className="option-icon" />
-                    {text.uploadFiles}
-                  </label>
-                </div>
+          {/* UNIFIED DROP ZONE UI */}
+          {uploadedFiles.length === 0 && (
+            <div className="upload-box">
+              <div className="upload-icon-large">
+                <FontAwesomeIcon icon={faUpload} />
+              </div>
+              <h3>{text.dragHint}</h3>
+              <p className="upload-subtext">{text.supportedTypes}</p>
+              
+              <div className="upload-actions">
+                <button className="btn-secondary" onClick={() => fileInputRef.current.click()}>
+                    <FontAwesomeIcon icon={faFile} /> {text.uploadFiles}
+                </button>
+                <button className="btn-secondary" onClick={() => folderInputRef.current.click()}>
+                    <FontAwesomeIcon icon={faFolderOpen} /> {text.uploadFolder}
+                </button>
+              </div>
+            </div>
+          )}
 
-                {/* FOLDER UPLOAD OPTION */}
-                <div>
-                  <input
-                    type="file"
-                    id="file-upload-folder"
-                    onChange={handleFileUpload}
-                    style={{ display: 'none' }}
-                    multiple
-                    webkitdirectory=""
-                    directory=""
-                  />
-                  <label htmlFor="file-upload-folder" className="upload-option">
-                    <FontAwesomeIcon icon={faFolderOpen} className="option-icon" />
-                    {text.uploadFolder}
-                  </label>
+
+          {/* COMPACT HEADER FOR WHEN FILES EXIST */}
+          {uploadedFiles.length > 0 && (
+              <div className="section-header">
+                <h2>{text.files}</h2>
+                <div className="action-buttons">
+                    <button className="btn-icon" onClick={() => fileInputRef.current.click()} title={text.uploadFiles}>
+                        <FontAwesomeIcon icon={faFile} />
+                    </button>
+                    <button className="btn-icon" onClick={() => folderInputRef.current.click()} title={text.uploadFolder}>
+                        <FontAwesomeIcon icon={faFolderOpen} />
+                    </button>
                 </div>
               </div>
-            )}
-
-          </div>
+          )}
 
         </section>
 
