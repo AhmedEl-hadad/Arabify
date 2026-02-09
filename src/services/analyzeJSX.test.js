@@ -39,7 +39,7 @@ describe('analyzeJSX', () => {
         const result = analyzeJSX(code, mockText);
         expect(result.warnings).toEqual(
             expect.arrayContaining([
-                expect.objectContaining({ msg: 'Avoid marginLeft' })
+                expect.objectContaining({ code: 'AVOID_PHYSICAL_PROP' })
             ])
         );
         expect(result.score).toBeLessThan(100);
@@ -54,7 +54,7 @@ describe('analyzeJSX', () => {
         const result = analyzeJSX(code, mockText);
         expect(result.warnings).toEqual(
             expect.arrayContaining([
-                expect.objectContaining({ msg: 'Avoid textAlign' })
+                expect.objectContaining({ code: 'AVOID_TEXT_ALIGN' })
             ])
         );
     });
@@ -68,7 +68,7 @@ describe('analyzeJSX', () => {
         const result = analyzeJSX(code, mockText);
         expect(result.warnings).toEqual(
             expect.arrayContaining([
-                expect.objectContaining({ msg: 'Avoid float' })
+                expect.objectContaining({ code: 'AVOID_FLOAT' })
             ])
         );
     });
@@ -82,44 +82,24 @@ describe('analyzeJSX', () => {
         const result = analyzeJSX(code, mockText);
         expect(result.warnings).toEqual(
             expect.arrayContaining([
-                expect.objectContaining({ msg: 'Avoid borderRadius shorthand' })
+                expect.objectContaining({ code: 'AVOID_BORDER_RADIUS_SHORTHAND' })
             ])
         );
     });
 
-    test('detects missing alt in img', () => {
-        const code = `
-      const Component = () => <img src="foo.jpg" />;
-    `;
-        const result = analyzeJSX(code, mockText);
-        expect(result.warnings).toEqual(
-            expect.arrayContaining([
-                expect.objectContaining({ type: 'Alt Error' })
-            ])
-        );
-    });
+    // Alt img test moved to analyzeA11Y.test.js
 
-    test('detects empty button without aria-label', () => {
-        const code = `
-      const Component = () => <button />;
-    `;
-        const result = analyzeJSX(code, mockText);
-        expect(result.warnings).toEqual(
-            expect.arrayContaining([
-                expect.objectContaining({ msg: 'Empty Button' })
-            ])
-        );
-    });
+    // Empty button test moved to analyzeA11Y.test.js
 
     test('detects missing Header/Footer in layout (if main/body present)', () => {
         const code = `
       const Layout = () => <main>Content</main>;
     `;
-        const result = analyzeJSX(code, mockText);
+        const result = analyzeJSX(code, mockText, { isAppFile: true });
         expect(result.warnings).toEqual(
             expect.arrayContaining([
-                expect.objectContaining({ msg: 'Missing Header' }),
-                expect.objectContaining({ msg: 'Missing Footer' })
+                expect.objectContaining({ code: 'MISSING_HEADER' }),
+                expect.objectContaining({ code: 'MISSING_FOOTER' })
             ])
         );
     });
@@ -131,8 +111,8 @@ describe('analyzeJSX', () => {
         const result = analyzeJSX(code, mockText);
         expect(result.warnings).toEqual(
             expect.arrayContaining([
-                expect.objectContaining({ msg: 'Avoid text-left/right' }),
-                expect.objectContaining({ msg: 'Avoid physical margin/padding' })
+                expect.objectContaining({ code: 'AVOID_TEXT_LEFT_RIGHT_CLASS' }),
+                expect.objectContaining({ code: 'AVOID_PHYSICAL_MARGIN_PADDING_CLASS' })
             ])
         );
     });

@@ -112,39 +112,9 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
 
 
                 // Accessibility: img alt
-            if (name === 'img') {
-                const altAttr = node.attributes.find(attr => attr.type === 'JSXAttribute' && attr.name.name === 'alt');
-                if (!altAttr) {
-                    score -= 5;
-                    warnings.push({
-                        type: "errtypeAlt",
-                        code: "MISSING_ALT",
-                        args: [],
-                        blogID: 2
-                    });
-                }
-            }
+                // Accessibility: img alt moved to analyzeA11Y.js
 
-            // Accessibility: button aria-label
-            if (name === 'button') {
-                // Check if it has content (children) - this is hard in simple traversal without parent context or full subtree check
-                // So we strictly check for aria-label or title if we can't easily check children text
-                // For now, let's check if it has 'aria-label' or 'title'
-                const hasLabel = node.attributes.some(attr =>
-                    attr.type === 'JSXAttribute' && (attr.name.name === 'aria-label' || attr.name.name === 'title')
-                );
-
-                // We can't easily check if it has text content without looking at the closing element's parent's children.
-                // But we can check if it's self-closing <button /> which is definitely bad if no label
-                if (node.selfClosing && !hasLabel) {
-                    score -= 5;
-                    warnings.push({
-                        type: "errtypeAlt",
-                        code: "EMPTY_BUTTON",
-                        blogID: 2
-                    });
-                }
-            }
+            // Accessibility: button aria-label moved to analyzeA11Y.js
 
             // RTL: className strings
             const classAttr = node.attributes.find(attr => attr.type === 'JSXAttribute' && (attr.name.name === 'className' || attr.name.name === 'class'));

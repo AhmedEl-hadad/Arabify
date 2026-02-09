@@ -92,21 +92,7 @@ const analyzeHTML = (htmlString, text, options = { isMainFile: true, checkStruct
     }
   }
 
-  // Check Images for Alt (Apply to ALL files)
-  const images = doc.querySelectorAll("img");
-  images.forEach((img, index) => {
-    // Check if alt is missing OR empty (alt="") is valid, but missing is bad
-    if (!img.hasAttribute("alt")) {
-      score -= 5;
-
-      warnings.push({
-        type: "errtypeAlt",
-        code: "MISSING_ALT",
-        args: [index + 1],
-        blogID: 2
-      });
-    }
-  });
+  // Check Images for Alt moved to analyzeA11Y.js
 
   // --- MULTI-LANG INJECTION (If mode is multi-lang AND is main file) ---
   if (options.mode === 'multi-lang' && options.isMainFile) {

@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import './ConfigWizard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faMagic, faGlobe, faTimes, faCode, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faMagic, faGlobe, faTimes, faCode, faCheck, faUniversalAccess } from '@fortawesome/free-solid-svg-icons';
 import { faReact } from '@fortawesome/free-brands-svg-icons';
 import { LanguageContext } from '../contexts/LanguageContext';
 
@@ -87,6 +87,23 @@ const ConfigWizard = ({ onStart, onCancel }) => {
                         >
                             <FontAwesomeIcon icon={faCheck} className="mode-icon" />
                             <span className="mode-label">{text.modeFixAll}</span>
+                        </div>
+
+                        <div
+                            className={`mode-option ${mode === 'best-practices' ? 'selected' : ''}`}
+                            onClick={() => setMode('best-practices')}
+                        >
+                            <FontAwesomeIcon icon={faUniversalAccess} className="mode-icon" />
+                            <span className="mode-label">{text.modeBestPractices}</span>
+                        </div>
+
+                         <div
+                            className={`mode-option ${mode === 'full-best-practices' ? 'selected' : ''}`}
+                            onClick={() => setMode('full-best-practices')}
+                             style={{ opacity: projectType === 'vanilla' ? 0.5 : 1, pointerEvents: projectType === 'vanilla' ? 'none' : 'auto' }}
+                        >
+                            <FontAwesomeIcon icon={faMagic} className="mode-icon" />
+                            <span className="mode-label">{text.modeFullWithBestPractices}</span>
                         </div>
                     </div>
                 </div>

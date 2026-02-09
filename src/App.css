@@ -9,7 +9,8 @@
   --border-width: 1px;
   --font-en: "Righteous", sans-serif;
   --font-ar: "IBM Plex Sans Arabic", sans-serif;
-  --main-font: var(--font-en);
+  --header-font: var(--font-en);
+  --main-font: "Stack Sans Text", sans-serif;
   --btn-font: "Stack Sans Text", sans-serif;
   --bg-glass: rgba(255, 255, 255, 0.05);
   --border-glass: rgba(255, 255, 255, 0.1);
@@ -23,6 +24,11 @@
 
 :root:lang(ar) {
   --main-font: var(--font-ar);
+  --header-font: var(--font-ar);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--header-font);
 }
 
 * {
@@ -115,6 +121,7 @@ nav {
   font-weight: normal;
   color: var(--bright);
   font-size: 1rem;
+  font-family: var(--header-font);
 }
 
 nav ul {
@@ -219,7 +226,7 @@ nav .logo {
 }
 
 .hero-title {
-  font-family: "Stack Sans Text", sans-serif;
+  font-family: var(--header-font);
   font-size: clamp(1.8rem, 10vw, 3.5rem);
 
   font-weight: bold;
@@ -270,7 +277,8 @@ nav .logo {
   width: 100%;
 }
 
-.split-char {
+.split-char, .split-word {
+  font-family: var(--header-font);
   display: inline-block;
   will-change: transform, opacity;
   backface-visibility: hidden;

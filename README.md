@@ -55,7 +55,10 @@
   - **Accumulation**: Add files incrementally without clearing the previous selection.
 - **Visual Polish**:
   - **Glassmorphism**: Consistent glass-effect styling across headers and inputs.
-  - **Descriptive Errors**: CSS warnings now say "Found X" (descriptive) instead of "Replaced X".
+  - **Refined Feedback**: Best Practices indicators now feature dedicated icons and clearer status messages.
+- **Codebase & Architecture**:
+  - **Modular A11Y Logic**: Extracted accessibility checks into a dedicated `analyzeA11Y` service for better maintainability and testability.
+  - **Robust Testing**: Expanded test suite with integration tests for accessibility triggers and improved unit test coverage.
 - **Multi-Language & CSS Fixes**:
   - **Auto-Fix Float**: Automatically converts `float: left` to `float: inline-start`.
   - **JSX Inline Style Fixes**: Transforms inline styles in JSX to logical properties.
@@ -63,9 +66,6 @@
   - **Dynamic Indentation**: Automatically detects and respects existing 2-space or 4-space indentation.
   - **Smart Placement**: Intelligently places the `LanguageToggle` inside list items (`<li>`) if a list is detected within the `<nav>`.
   - **Header Fallback**: If no `<nav>` is found, strictly injects into `<header>` to ensure accessibility.
-- **Codebase Refactoring**:
-  - Analyzers moved to `src/services` for better separation of concerns.
-  - Standardized component naming (`SplitText.js`).
 - **Reporting & Scoring**:
   - **JSON Reports**: Download detailed analysis reports with standardized English keys, regardless of UI language.
   - **Weighted Scoring**: "Main files" (App.js, index.html) now carry 2x weight to prioritize core architectural patterns.
@@ -150,17 +150,24 @@ Try it out here: [**arabify-by-taim-kellizy.vercel.app**](https://arabify-by-tai
 
 ```text
 src/
-├── App.js          # Main application logic & Language state
-├── components/     # Reusable UI components
-├── services/       # Core Analysis Logic
-│   ├── analyzeCSS.js   # Algorithm for processing CSS (PostCSS)
-│   ├── analyzeHTML.js  # Algorithm for processing HTML
-│   ├── analyzeJSX.js   # Algorithm for processing JSX/TSX
-│   └── ...
-├── pages/          # Route pages
+├── App.js              # Main application logic & Router
+├── App.css             # Global Styles & Font Definitions
+├── content.js          # Dictionary for English/Arabic text
+├── components/         # Reusable UI components (Header, Footer, SplitText, etc.)
+├── contexts/           # Global Contexts
+│   └── LanguageContext.js # Language State Management
+├── pages/              # Route pages
 │   ├── Home.js         # Main landing & tool page
 │   └── Blog.js         # Educational content page
-└── content.js      # Dictionary for English/Arabic text
+├── services/           # Core Analysis Logic
+│   ├── analyzeA11Y.js  # Accessibility & Best Practices checks
+│   ├── analyzeCSS.js   # CSS Parser & RTL Logic
+│   ├── analyzeHTML.js  # HTML Structure & Meta checks
+│   └── analyzeJSX.js   # React/JSX code analysis
+└── utils/              # Helper Utilities
+    ├── fileScanner.js  # File processing logic
+    ├── scoreCalculator.js # Weighted scoring algorithm
+    └── ...
 ```
 
 ## 🤝 Feedback and Contributions

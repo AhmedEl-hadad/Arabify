@@ -10,15 +10,17 @@ jest.mock('react-syntax-highlighter/dist/esm/styles/prism', () => ({
 
 import App from './App';
 
-test('renders Header and Footer', () => {
-    render(<App />);
-    // Check for Header elements (assuming Header contains some specific text or role)
-    // Based on reading App.js it passes 'text' prop. We can check if basic English text renders by default.
-    // We'll check for something generic or a known default string if we knew content.js.
-    // For now, let's just check that it doesn't crash and renders *something* structure-wise if possible,
-    // or check for elements we know exist like headings or buttons if we peeked deeper.
-    // Since we haven't seen Header/Footer content in detail, simple smoke test:
-
+test('renders Header and Footer', async () => {
+    // App contains its own Router, so we can render it directly
+    render(<App />); 
+    
+    // Check for "Arabify" or similar text from Header/Footer
+    // Using findByText since it might be async if there are effects
+    // But basic rendering should be immediate.
+    // Let's check for the logo alt text or something we know exists.
+    // In Header.js (standard), there's usually a logo.
+    
+    // Smoke test: just check if the App container exists
     const appContainer = document.querySelector('.App');
     expect(appContainer).toBeInTheDocument();
 });

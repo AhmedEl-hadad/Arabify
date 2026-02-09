@@ -4,6 +4,7 @@ import CodeWindow from '../components/CodeWindow';
 import analyzeHTML from '../services/analyzeHTML';
 import analyzeCSS from '../services/analyzeCSS';
 import analyzeJSX from '../services/analyzeJSX';
+import analyzeA11Y from '../services/analyzeA11Y';
 import ConfigWizard from '../components/ConfigWizard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faUpload, faFile, faFolderOpen, faCode, faFileAlt, faFileImage, faFileExport } from '@fortawesome/free-solid-svg-icons';
@@ -218,6 +219,16 @@ const Home = () => {
         }
       }
 
+      
+      // --- Best Practices / A11Y Check ---
+      if (config.mode === 'best-practices' || config.mode === 'full-best-practices') {
+          const a11yResult = await analyzeA11Y(file.content, file.type, text);
+          if (a11yResult) {
+              result.score = Math.max(0, result.score - a11yResult.scoreDeduction);
+              result.warnings.push(...a11yResult.warnings);
+          }
+      }
+      
       if (result.score < 100) allPerfect = false;
       newResults.push(result);
     }

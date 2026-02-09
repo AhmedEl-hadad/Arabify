@@ -103,39 +103,7 @@ const analyzeCSS = async (cssString, text, options = {}) => {
         }
       }
 
-      // 5. Pixel Check
-      if (decl.value && decl.value.includes('px')) {
-         // Regex to find number before px
-         const pxMatches = decl.value.match(/(\d*\.?\d+)px/g);
-         if (pxMatches) {
-            const hasLargePixels = pxMatches.some(match => parseFloat(match) > 10);
-            if (hasLargePixels) {
-               // Deduplicate warnings slightly by checking if strict dupes exist? 
-               // Or just allow one per file?
-              if (decl.prop === 'width' && decl.value.endsWith('px')) {
-            const val = parseFloat(decl.value);
-            if (val > 300) { // arbitrary threshold for "large" px widths
-                score -= 2;
-                warnings.push({
-                    type: "errtypeResponsiveness",
-                    code: "AVOID_LARGE_PX_WIDTH",
-                    args: [decl.value],
-                    blogID: 0
-                });
-            }
-        }
-               const alreadyWarned = warnings.some(w => w.code === "WARN_PX");
-               if (!alreadyWarned) {
-                  score -= 1;
-                  warnings.push({
-                    type: "errtypeResponsiveness",
-                    code: "WARN_PX",
-                    blogID: 4
-                  });
-               }
-            }
-         }
-      }
+// Pixel check moved to analyzeA11Y.js
 
     }
   };
