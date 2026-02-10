@@ -4,13 +4,11 @@
 <!-- Badges -->
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-0.3.0-blue.svg)](https://github.com/Taimkellizy/ArabifyByTaimKellizy)
+[![Version](https://img.shields.io/badge/version-0.7.0-blue.svg)](https://github.com/Taimkellizy/ArabifyByTaimKellizy)
 [![React](https://img.shields.io/badge/react-%2320232a.svg?style=flat&logo=react&logoColor=%2361DAFB)](https://react.dev/)
 [![Vercel](https://img.shields.io/badge/vercel-%23000000.svg?style=flat&logo=vercel&logoColor=white)](https://arabify-by-taim-kellizy.vercel.app)
 
-**Arabify (عَرِّب)** scans HTML & CSS files and scores how well a page is “Arabified”. It checks AR-SEO signals, RTL layout, accessibility (alt, labels, ARIA), and basic performance heuristics — then returns a 0–100 score, a categorized breakdown, copyable fixes, and a patched preview (Only for CSS). All processing runs client-side.
-
-<!-- Social Share -->
+**Arabify (عَرِّب)** is an RTL-first static analysis tool and toolkit for HTML/CSS/JS. It scans direction-sensitive code (physical left/right usage, layout assumptions) and scores how ready a page is for RTL languages. The focus is RTL correctness first; optional checks for accessibility and AR-SEO are included as secondary signals. All analysis runs client-side and is fully rule-based — no AI, no guesswork.
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=social&logo=linkedin)](https://www.linkedin.com/in/taimkellizy/)
 
@@ -42,34 +40,41 @@
 
 ## ✨ What's New
 
-### Version 0.3.0
+### Version 0.7.0 (Major Release)
 
 > [!TIP]
 > This release introduces a **Unified Upload Experience**, **Refined UI**, **Code Injection Intelligence**, and **CSS Modernization**.
 
 #### ⚡ New Features & Improvements
 
+- **Intelligent Context-Aware Analysis**:
+  - **Zero False Positives**: Differentiates between CSS style objects and generic data objects using context heuristics (e.g., inside `style={{}}` props, or variables named `*Style`).
+  - **Strict vs. Ambiguous**: "Strict" physical properties (e.g., `marginLeft`) are always flagged. "Ambiguous" properties (e.g., `left`, `right`) are only flagged when used in a style context.
+  - **Class Name Detection**: scores against hardcoded directional class names like `text-left`, `float-right`.
+- **TypeScript Support**:
+  - **Type-Safe Parsing**: Full support for `.ts` and `.tsx` files.
+  - **Heuristic Unwrapping**: Handles `as const` assertions (e.g., `textAlign: 'left' as const`) and other TS specific syntax without choking.
+- **Enhanced Auto-Fixer**:
+  - **100% Border Coverage**: Now fully supports and fixes `border-left-width`, `border-left-style`, `border-left-color` (and their right counterparts) to their logical equivalents.
+  - **Smarter Replacements**: Only applies fixes where it's confident, reducing the risk of breaking non-style code.
 - **Unified Upload & Drag-and-Drop**:
   - **Unified Flow**: Removed dropdowns. Single, seamless drop zone for mixed files and folders.
   - **Recursive Scanning**: Drag nested folders and files simultaneously; deep scans verify all content.
   - **Accumulation**: Add files incrementally without clearing the previous selection.
-- **Visual Polish**:
-  - **Glassmorphism**: Consistent glass-effect styling across headers and inputs.
-  - **Refined Feedback**: Best Practices indicators now feature dedicated icons and clearer status messages.
-- **Codebase & Architecture**:
-  - **Modular A11Y Logic**: Extracted accessibility checks into a dedicated `analyzeA11Y` service for better maintainability and testability.
-  - **Robust Testing**: Expanded test suite with integration tests for accessibility triggers and improved unit test coverage.
-- **Multi-Language & CSS Fixes**:
-  - **Auto-Fix Float**: Automatically converts `float: left` to `float: inline-start`.
-  - **JSX Inline Style Fixes**: Transforms inline styles in JSX to logical properties.
 - **Smart React Injection Engine**:
-  - **Dynamic Indentation**: Automatically detects and respects existing 2-space or 4-space indentation.
   - **Smart Placement**: Intelligently places the `LanguageToggle` inside list items (`<li>`) if a list is detected within the `<nav>`.
   - **Header Fallback**: If no `<nav>` is found, strictly injects into `<header>` to ensure accessibility.
+  - **Dynamic Indentation**: Automatically detects and respects existing 2-space or 4-space indentation.
 - **Reporting & Scoring**:
   - **JSON Reports**: Download detailed analysis reports with standardized English keys, regardless of UI language.
   - **Weighted Scoring**: "Main files" (App.js, index.html) now carry 2x weight to prioritize core architectural patterns.
-  - **Visual Scorecard**: New circular progress indicator for immediate score visibility.
+- **Multi-Language & CSS Fixes**:
+  - **JSX Inline Style Fixes**: Transforms inline styles in JSX to logical properties.
+  - **Auto-Fix Float**: Automatically converts `float: left` to `float: inline-start`.
+- **Codebase & Architecture**:
+  - **Modular Logic**: Extracted RTL constants to `constants.js` for better maintainability and to prevent self-scanning issues.
+  - **Modular A11Y Logic**: Extracted accessibility checks into a dedicated `analyzeA11Y` service for better maintainability and testability.
+  - **Robust Testing**: Expanded test suite with context-specific tests and integration checks.
 
 ![Analysis Example](assets/warnings-example.png)
 

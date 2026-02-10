@@ -111,7 +111,7 @@ describe('analyzeJSX', () => {
         const result = analyzeJSX(code, mockText);
         expect(result.warnings).toEqual(
             expect.arrayContaining([
-                expect.objectContaining({ code: 'AVOID_TEXT_LEFT_RIGHT_CLASS' }),
+                expect.objectContaining({ code: 'DETECTED_DIRECTIONAL_CLASS_NAME' }),
                 expect.objectContaining({ code: 'AVOID_PHYSICAL_MARGIN_PADDING_CLASS' })
             ])
         );

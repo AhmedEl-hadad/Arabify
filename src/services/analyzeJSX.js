@@ -1,6 +1,12 @@
 import { parse } from '@babel/parser';
-
 import { injectProvider, injectToggle } from '../utils/reactInjector';
+import { 
+    STRICT_PHYSICAL_PROPS, 
+    AMBIGUOUS_PROPS, 
+    STRICT_CSS_PROPS, 
+    LOGICAL_PROPS, 
+    RTL_MAPPINGS 
+} from './constants';
 
 /**
  * Analyzes JSX/React code for inline styles, semantic structure, and accessibility.
@@ -12,16 +18,28 @@ import { injectProvider, injectToggle } from '../utils/reactInjector';
  * @param {boolean} [options.isAppFile=false] - Whether this is the main App component.
  * @returns {object} Result object containing score, warnings, foundTags, and fixedCode.
  */
-const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false }) => {
+const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false, fileName: '' }) => {
     let score = 100;
     let warnings = [];
     let fixedCode = null;
 
     let ast;
     try {
+        const isTS = options.fileName && options.fileName.toLowerCase().endsWith('.ts') && !options.fileName.toLowerCase().endsWith('.tsx');
+        
+        const plugins = [
+            'typescript', 
+            'classProperties', 'dynamicImport', 'exportDefaultFrom', 'exportNamespaceFrom', 'modules', 'objectRestSpread'
+        ];
+
+        // Only add JSX plugin if NOT a pure .ts file
+        if (!isTS) {
+            plugins.push('jsx');
+        }
+
         ast = parse(codeString, {
             sourceType: 'module',
-            plugins: ['jsx', 'typescript', 'classProperties', 'dynamicImport', 'exportDefaultFrom', 'exportNamespaceFrom', 'modules', 'objectRestSpread']
+            plugins: plugins
         });
     } catch (e) {
         // If parsing fails, return a fatal error or just basic score reduction
@@ -29,50 +47,129 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
         return { score: 0, warnings: [{ type: "errtypeGeneric", code: "PARSE_ERROR", blogID: 0 }] };
     }
 
-    // Helper to traverse AST
-    const traverse = (node, visitor) => {
+    // Helper to traverse AST with Ancestry Tracking
+    const traverse = (node, visitor, ancestors = []) => {
         if (!node || typeof node !== 'object') return;
 
         if (visitor[node.type]) {
-            visitor[node.type](node);
+            visitor[node.type](node, ancestors);
         }
 
         for (const key in node) {
             if (key === 'loc' || key === 'start' || key === 'end' || key === 'comments') continue;
             const child = node[key];
+            const newAncestors = [...ancestors, node];
             if (Array.isArray(child)) {
-                child.forEach(c => traverse(c, visitor));
+                child.forEach(c => traverse(c, visitor, newAncestors));
             } else if (child && typeof child === 'object') {
-                traverse(child, visitor);
+                traverse(child, visitor, newAncestors);
             }
         }
+    };
+
+    // --- CONTEXT-AWARE HELPER ---
+    const getStyleContext = (node, ancestors) => {
+        const parent = ancestors.length > 0 ? ancestors[ancestors.length - 1] : null;
+        if (!parent) return false;
+
+        // 1. Prop Context: style={{ ... }}, sx={{ ... }}, css={{ ... }}
+        // Structure: JSXAttribute -> JSXExpressionContainer -> ObjectExpression
+        // So parent is JSXExpressionContainer, grandparent is JSXAttribute
+        const grandparent = ancestors.length > 1 ? ancestors[ancestors.length - 2] : null;
+        
+        if (parent.type === 'JSXExpressionContainer' && grandparent && grandparent.type === 'JSXAttribute') {
+            const attrName = grandparent.name.name;
+            if (['style', 'sx', 'css'].includes(attrName)) return true;
+        }
+
+        // 2. Naming Context: const buttonStyle = { ... }
+        // Parent of ObjectExpression could be VariableDeclarator
+        if (parent.type === 'VariableDeclarator' && parent.id && parent.id.name) {
+            const varName = parent.id.name.toLowerCase();
+            if (varName.includes('style') || varName.includes('css')) return true;
+        }
+
+        // 3. Sibling Context: Contains known CSS properties
+        const hasStrictSibling = node.properties.some(p => {
+            if (!p.key) return false;
+            const k = p.key.name || p.key.value;
+            return STRICT_CSS_PROPS.includes(k);
+        });
+        
+        if (hasStrictSibling) return true;
+
+        return false;
     };
 
     // State to track findings
     const foundTags = new Set();
 
+    // Helper to check Class Names (Moved inside to access score)
+    const checkClassName = (className) => {
+        if (!className) return;
+
+        // 1. Text alignment classes (left/right)
+        if (className.match(/\b(text-left|text-right)\b/)) {
+            score -= 5;
+            warnings.push({ type: "errtypeRTL", code: "DETECTED_DIRECTIONAL_CLASS_NAME", blogID: 3 });
+        }
+        
+        // 2. Float alignment classes
+        if (className.match(/\b(float-left|float-right)\b/)) {
+            score -= 5;
+            warnings.push({ type: "errtypeRTL", code: "DETECTED_DIRECTIONAL_CLASS_NAME", blogID: 3 });
+        }
+
+        // 3. Physical Margin/Padding
+        if (/\b(ml-|mr-|pl-|pr-)\d+/.test(className)) {
+             // We can keep this as is, or also merge it. The user specifically asked to rename AVOID_TEXT_LEFT_RIGHT_CLASS.
+             // But let's assume "DETECTED_DIRECTIONAL_CLASS_NAME" covers directional classes.
+             // However, the prompt only explicitly mentioned renaming AVOID_TEXT_LEFT_RIGHT_CLASS.
+             // I will leave AVOID_PHYSICAL_MARGIN_PADDING_CLASS as it is distinct, unless requested otherwise.
+             // ACTUALLY: "Rename Error Code: Change AVOID_TEXT_LEFT_RIGHT_CLASS to DETECTED_DIRECTIONAL_CLASS_NAME"
+             // It didn't say change ALL class warnings.
+            warnings.push({ type: "errtypeRTL", code: "AVOID_PHYSICAL_MARGIN_PADDING_CLASS", blogID: 3 });
+        }
+    };
 
     // Visitor
     const visitor = {
-        ObjectExpression: (node) => {
+        ObjectExpression: (node, ancestors) => {
+            const isStyle = getStyleContext(node, ancestors);
+
             node.properties.forEach(prop => {
                 if (!prop.key) return;
                 const keyName = prop.key.name || prop.key.value;
 
-                // 1. Check for Physical Properties (Keys)
-                const physicalProps = [
-                    'marginLeft', 'marginRight', 'paddingLeft', 'paddingRight',
-                    'left', 'right',
-                    'borderLeft', 'borderRight', 'borderLeftWidth', 'borderRightWidth',
-                    'borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomLeftRadius', 'borderBottomRightRadius'
-                ];
+                // 1. Strict Physical Properties (Always Errors)
+                if (STRICT_PHYSICAL_PROPS.includes(keyName)) {
+                    // Mapping Heuristic: Ignore if value is a corresponding logical property string
+                    let valueStr = '';
+                    if (prop.value && prop.value.type === 'StringLiteral') {
+                        valueStr = prop.value.value;
+                    } else if (prop.value && prop.value.type === 'TSAsExpression' && prop.value.expression.type === 'StringLiteral') {
+                        valueStr = prop.value.expression.value;
+                    }
 
-                if (physicalProps.includes(keyName)) {
+                    if (LOGICAL_PROPS.includes(valueStr)) {
+                        return; // Ignore mapping objects
+                    }
+
                     score -= 5;
                     warnings.push({ type: "errtypeRTL", code: "AVOID_PHYSICAL_PROP", args: [keyName], blogID: 3 });
+                    return; // Done with this prop
                 }
 
-                // 2. Check Values (textAlign, float)
+                // 2. Ambiguous Properties (left, right) - Context Aware
+                if (AMBIGUOUS_PROPS.includes(keyName)) {
+                    if (isStyle) {
+                        score -= 5;
+                        warnings.push({ type: "errtypeRTL", code: "AVOID_PHYSICAL_PROP", args: [keyName], blogID: 3 });
+                    }
+                    // Else: Ignore (0 points)
+                }
+
+                // 3. Check Values (textAlign, float)
                 // Handle TSAsExpression (e.g. 'left' as const)
                 let valueNode = prop.value;
                 if (valueNode && valueNode.type === 'TSAsExpression') {
@@ -92,7 +189,7 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
                     }
                 }
 
-                // 3. Check borderRadius shorthand (4 values)
+                // 4. Check borderRadius shorthand (4 values)
                 if (keyName === 'borderRadius') {
                     if (valueNode && valueNode.type === 'StringLiteral') {
                         const parts = valueNode.value.trim().split(/\s+/);
@@ -120,15 +217,15 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
             const classAttr = node.attributes.find(attr => attr.type === 'JSXAttribute' && (attr.name.name === 'className' || attr.name.name === 'class'));
             if (classAttr && classAttr.value) {
                 if (classAttr.value.type === 'StringLiteral') {
-                    checkClassName(classAttr.value.value, warnings, text);
+                    checkClassName(classAttr.value.value);
                 } else if (classAttr.value.type === 'JSXExpressionContainer' && classAttr.value.expression.type === 'StringLiteral') {
-                    checkClassName(classAttr.value.expression.value, warnings, text);
+                    checkClassName(classAttr.value.expression.value);
                 }
             }
         }
     };
 
-    traverse(ast, visitor);
+    traverse(ast, visitor, []);
 
     // Safety
     score = Math.max(0, score);
@@ -158,7 +255,9 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
     if (options.mode === 'fix' || options.mode === 'multi-lang') {
         const replacements = [];
         const fixVisitor = {
-             ObjectExpression: (node) => {
+             ObjectExpression: (node, ancestors) => {
+                const isStyle = getStyleContext(node, ancestors);
+
                 node.properties.forEach(prop => {
                     if (!prop.key) return;
                     const keyName = prop.key.name || prop.key.value;
@@ -170,25 +269,24 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
                     };
 
                     // KEY MAPPINGS
-                    const keyMap = {
-                        'marginLeft': 'marginInlineStart',
-                        'marginRight': 'marginInlineEnd',
-                        'paddingLeft': 'paddingInlineStart',
-                        'paddingRight': 'paddingInlineEnd',
-                        'borderLeft': 'borderInlineStart',
-                        'borderRight': 'borderInlineEnd',
-                        'borderTopLeftRadius': 'borderStartStartRadius',
-                        'borderTopRightRadius': 'borderStartEndRadius',
-                        'borderBottomLeftRadius': 'borderEndStartRadius',
-                        'borderBottomRightRadius': 'borderEndEndRadius',
-                        'left': 'insetInlineStart', // Positioning
-                        'right': 'insetInlineEnd'
-                    };
-
-                    if (keyMap[keyName]) {
-                        // Replace Key
-                        addReplacement(prop.key.start, prop.key.end, keyMap[keyName]);
+                    // Use RTL_MAPPINGS from constants.js
+                    // RTL_MAPPINGS is array of arrays: [['marginLeft', 'marginInlineStart'], ...]
+                    
+                    const mapping = RTL_MAPPINGS.find(m => m[0] === keyName);
+                    
+                    if (mapping) {
+                        const targetKey = mapping[1];
+                        
+                        // Strict check: Always replace
+                        if (STRICT_PHYSICAL_PROPS.includes(keyName)) {
+                             addReplacement(prop.key.start, prop.key.end, targetKey);
+                        }
+                        // Ambiguous check: Replace only if isStyle
+                        else if (AMBIGUOUS_PROPS.includes(keyName) && isStyle) {
+                             addReplacement(prop.key.start, prop.key.end, targetKey);
+                        }
                     }
+
 
                     // VALUE MAPPINGS
                     // Handle literal strings
@@ -209,7 +307,7 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
         };
 
         // Run visitor to collect replacements
-        traverse(ast, fixVisitor);
+        traverse(ast, fixVisitor, []);
 
         if (replacements.length > 0) {
             // Sort Descending to prevent index shift
@@ -252,25 +350,6 @@ const getJSXName = (node) => {
         return `${getJSXName(node.object)}.${getJSXName(node.property)}`;
     }
     return '';
-};
-
-const checkClassName = (className, warnings, text) => {
-    if (!className) return;
-
-    // This is a loose check, might match "bright-color" which is false positive.
-    // Better to check for word boundaries or specific tailwind classes
-    // For now, let's look for "text-left", "text-right", "float-left", "float-right"
-
-    // The instruction snippet replaces the original regex check and adds a score reduction.
-    // 1. Text alignment classes (left/right)
-    if (className.match(/\b(text-left|text-right)\b/)) {
-        warnings.push({ type: "errtypeRTL", code: "AVOID_TEXT_LEFT_RIGHT_CLASS", blogID: 3 });
-        // score -= 5; // Score reduction is handled in the main analyzeJSX function, not here.
-    }
-
-    if (/\b(ml-|mr-|pl-|pr-)\d+/.test(className)) {
-        warnings.push({ type: "errtypeRTL", code: "AVOID_PHYSICAL_MARGIN_PADDING_CLASS", blogID: 3 });
-    }
 };
 
 export default analyzeJSX;

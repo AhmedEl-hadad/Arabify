@@ -111,7 +111,7 @@ const Home = () => {
             let type = 'unknown';
             if (file.name.endsWith('.css')) type = 'css';
             else if (file.name.endsWith('.html')) type = 'html';
-            else if (file.name.endsWith('.jsx') || file.name.endsWith('.tsx') || file.name.endsWith('.js')) type = 'jsx';
+            else if (file.name.endsWith('.jsx') || file.name.endsWith('.tsx') || file.name.endsWith('.js') || file.name.endsWith('.ts')) type = 'jsx';
     
             const reader = new FileReader();
             reader.onload = (event) => {
@@ -193,7 +193,8 @@ const Home = () => {
         const { score, warnings, foundTags, fixedCode } = analyzeJSX(file.content, text, {
              mode: config.mode,
              // Check exact name OR path ending (e.g. src/App.js)
-             isAppFile: (file.name === config.appFileName || file.path.endsWith(`/${config.appFileName}`))
+             isAppFile: (file.name === config.appFileName || file.path.endsWith(`/${config.appFileName}`)),
+             fileName: file.name
         });
         if (foundTags) foundTags.forEach(t => projectStats.foundTags.add(t));
         result = { ...result, score, warnings, fixedCode };
@@ -398,7 +399,7 @@ const Home = () => {
   const getFileIcon = (fileName) => {
     if (fileName.endsWith('.html')) return faHtml5;
     if (fileName.endsWith('.css')) return faCss3;
-    if (fileName.endsWith('.js') || fileName.endsWith('.jsx') || fileName.endsWith('.tsx')) return faReact;
+    if (fileName.endsWith('.js') || fileName.endsWith('.jsx') || fileName.endsWith('.tsx') || fileName.endsWith('.ts')) return faReact;
     if (fileName.match(/\.(jpg|jpeg|png|gif|svg)$/i)) return faFileImage;
     return faFileAlt;
   };
