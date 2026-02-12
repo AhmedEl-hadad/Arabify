@@ -32,28 +32,28 @@ describe('analyzeCSS', () => {
 
     test('converts margin-left to margin-inline-start', async () => {
         const css = '.foo { margin-left: 10px; }';
-        const result = await analyzeCSS(css, mockText);
+        const result = await analyzeCSS(css, mockText, { isMainFile: true });
         expect(result.score).toBeLessThan(100);
         expect(result.warnings).toEqual(
-            expect.arrayContaining([expect.objectContaining({ msg: 'Fix margin-left' })])
+            expect.arrayContaining([expect.objectContaining({ code: 'FIX_MARGIN_LEFT' })])
         );
         expect(result.fixedCSS).toContain('margin-inline-start: 10px');
     });
 
     test('converts text-align: left to start', async () => {
         const css = '.foo { text-align: left; }';
-        const result = await analyzeCSS(css, mockText);
+        const result = await analyzeCSS(css, mockText, { isMainFile: true });
         expect(result.warnings).toEqual(
-            expect.arrayContaining([expect.objectContaining({ msg: 'Fix text-align' })])
+            expect.arrayContaining([expect.objectContaining({ code: 'FIX_TEXT_ALIGN' })])
         );
         expect(result.fixedCSS).toContain('text-align: start');
     });
 
     test('explodes border-radius shorthand', async () => {
         const css = '.foo { border-radius: 1px 2px 3px 4px; }';
-        const result = await analyzeCSS(css, mockText);
+        const result = await analyzeCSS(css, mockText, { isMainFile: true });
         expect(result.warnings).toEqual(
-            expect.arrayContaining([expect.objectContaining({ msg: 'Fix border-radius shorthand' })])
+            expect.arrayContaining([expect.objectContaining({ code: 'FIX_BORDER_RADIUS_SHORTHAND' })])
         );
         expect(result.fixedCSS).toContain('border-start-start-radius: 1px');
         expect(result.fixedCSS).toContain('border-start-end-radius: 2px');
@@ -61,13 +61,5 @@ describe('analyzeCSS', () => {
         expect(result.fixedCSS).toContain('border-end-start-radius: 4px');
     });
 
-    test('warns about large pixel values', async () => {
-        const css = '.foo { width: 20px; }';
-        const result = await analyzeCSS(css, mockText);
-        expect(result.warnings).toEqual(
-            expect.arrayContaining([expect.objectContaining({ msg: 'Avoid large pixels' })])
-        );
-        // Pixel warnings don't enforce a fix implementation in the current logic, just a warning
-        expect(result.fixedCSS).toContain('width: 20px');
-    });
+    // Pixel warning test moved to analyzeA11Y.test.js
 });

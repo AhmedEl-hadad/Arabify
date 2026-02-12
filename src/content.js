@@ -6,14 +6,17 @@ export const content = {
     blog: "BLOG",
     contact: "CONTACT",
     toggleBtn: "AR",
-    heroText: "RTL and Arabic SEO, simplified.",
-    heropar: "Instant scans for RTL, AR-SEO, fonts, and accessibility. Fix hints + live preview.",
+    heroText: "Simplify your RTL & Accessibility",
+    heropar:
+      "Instant scans for RTL, AR-SEO, fonts, and accessibility. Fix hints + live preview.",
     herobtn1: "Try Now",
     herobtn2: "View Source",
-    downloadFixed: "Download Fixed Code",
+    downloadFixed: "Download Fixed File",
+    downloadReport: "Download JSON Report",
     analyzeBtn: "Analyze Code",
     score: "Score:",
-    copyrights: "© 2025 Arabify. All rights reserved.",
+    totalScore: "Total Arabification Score",
+    copyrights: "© 2025 Arabify. Open Source (MIT License).",
     upFile: "Upload File",
     fileUped: "File Uploaded (Change?)",
     analyzing: "Analyzing...",
@@ -24,59 +27,387 @@ export const content = {
     uploadFolder: "Upload Folder",
     upload: "Upload",
     files: "Files",
+    dragHint: "Drag & drop files or folders anywhere here",
+    supportedTypes: "Supported: .html, .css, .js, .jsx, images",
+
+    // Wizard
+    wizardTitle: "Analysis Configuration",
+    modeSelect: "Select Analysis Mode",
+    modeScan: "Quick Scan (Report Only)",
+    modeFixCSS: "Auto-Fix CSS Only",
+    modeFixLang: "Inject Language Button Only",
+    modeBestPractices: "Best Practices (A11Y)",
+    modeFixAll: "Full Fix (CSS + Language Button)",
+    modeFullWithBestPractices: "Full Fix + Best Practices",
+    modeMultiLang: "Multi-Language Setup & Checks",
+    configFiles: "Project Configuration",
+    mainJs: "Main React Entry File (e.g. App.js)",
+    mainHtml: "Main HTML File (e.g. index.html)",
+    startBtn: "Start Analysis",
+    projectType: "Project Type",
+    typeReact: "React.js",
+    typeVanilla: "Vanilla (HTML/CSS/JS)",
+    cancelBtn: "Cancel",
 
     // Error Types
     errtypeStructure: "HTML Structure",
+    errPreSemantic: "We couldn't find a",
+    errPostSemantic: "tag in the entire project.",
     errtypeAlt: "Accessibility",
     errtypeMeta: "SEO & Meta Tags",
     errtypeLanguage: "Language Configuration",
     errtypeRTL: "RTL Styling",
     errtypeResponsiveness: "Responsiveness",
 
-    // --- HTML WARNINGS (Using JSX for styling) ---
-    msgMissingHeader: <>We couldn't find a <span className="en-code">&lt;header&gt;</span> tag. Consider replacing <span className="en-code">&lt;div className='header'&gt;</span> with <span className="en-code">&lt;header&gt;</span>.</>,
-    msgMissingNav: <>We couldn't find a <span className="en-code">&lt;nav&gt;</span> tag. Consider replacing <span className="en-code">&lt;div className='nav'&gt;</span> with <span className="en-code">&lt;nav&gt;</span>.</>,
-    msgMissingFooter: <>We couldn't find a <span className="en-code">&lt;footer&gt;</span> tag. Consider adding one for better structure.</>,
+    // --- ERROR DEFINITIONS (Structured for UI & JSON) ---
+    errors: {
+      // Structure
+      MISSING_HEADER: {
+        ui: (
+          <>
+            We couldn't find a <span className="en-code">&lt;header&gt;</span> tag.
+            Consider replacing{" "}
+            <span className="en-code">&lt;div className='header'&gt;</span> with{" "}
+            <span className="en-code">&lt;header&gt;</span>.
+          </>
+        ),
+        text: "We couldn't find a <header> tag. Consider replacing <div class='header'> with <header>."
+      },
+      MISSING_NAV: {
+        ui: (
+          <>
+            We couldn't find a <span className="en-code">&lt;nav&gt;</span> tag.
+            Consider replacing{" "}
+            <span className="en-code">&lt;div className='nav'&gt;</span> with{" "}
+            <span className="en-code">&lt;nav&gt;</span>.
+          </>
+        ),
+        text: "We couldn't find a <nav> tag. Consider replacing <div class='nav'> with <nav>."
+      },
+      MISSING_FOOTER: {
+        ui: (
+          <>
+            We couldn't find a <span className="en-code">&lt;footer&gt;</span> tag.
+            Consider adding one for better structure.
+          </>
+        ),
+        text: "We couldn't find a <footer> tag. Consider adding one for better structure."
+      },
+      MISSING_MAIN: {
+        ui: (
+          <>
+            We couldn't find a <span className="en-code">&lt;main&gt;</span> tag.
+            Consider wrapping your main content in{" "}
+            <span className="en-code">&lt;main&gt;</span>.
+          </>
+        ),
+        text: "We couldn't find a <main> tag. Consider wrapping your main content in <main>."
+      },
+      GLOBAL_MISSING_TAG: (tag) => ({
+        ui: (
+          <>
+            We couldn't find a <span className="en-code">{tag}</span> tag in the
+            entire project. (Global Check)
+          </>
+        ),
+        text: `We couldn't find a ${tag} tag in the entire project. (Global Check)`
+      }),
 
-    // FUNCTION: Dynamic ID
-    msgMissingAlt: (id) => <>Image <span className="en-code">#{id}</span> is missing an 'alt' attribute.</>,
+      // Accessibility
+      MISSING_ALT: (id) => ({
+        ui: (
+          <>
+            Image <span className="en-code">#{id}</span> is missing an 'alt'
+            attribute.
+          </>
+        ),
+        text: `Image #${id} is missing an 'alt' attribute.`
+      }),
+      EMPTY_BUTTON: {
+        ui: "Empty button found without aria-label.",
+        text: "Empty button found without aria-label."
+      },
 
-    msgMissingMetaCharset: <>Missing <span className="en-code">&lt;meta charset='utf-8'&gt;</span> tag for proper character encoding.</>,
-    msgMissingMetaViewport: <>Missing <span className="en-code">&lt;meta name='viewport'...&gt;</span> tag for responsive design.</>,
-    msgMissingMetaDescription: <>Missing <span className="en-code">&lt;meta name='description'...&gt;</span> tag for SEO.</>,
-    msgMissingMetaKeywords: <>Missing <span className="en-code">&lt;meta name='keywords'...&gt;</span> tag for SEO.</>,
-    msgMissingMetaAuthor: <>Missing <span className="en-code">&lt;meta name='author'...&gt;</span> tag for SEO.</>,
-    msgMissingLangAttribute: <>The <span className="en-code">&lt;html&gt;</span> tag is missing a <span className="en-code">lang</span> attribute.</>,
-    msgMissingDirAttribute: <>The <span className="en-code">&lt;html&gt;</span> tag is missing a <span className="en-code">dir</span> attribute.</>,
-    msgAvoidTextAlign: <>Avoid <span className="en-code">text-align: left/right</span>. Use <span className="en-code">start/end</span> for RTL support.</>,
-    msgAvoidFloat: <>Avoid <span className="en-code">float: left/right</span>. Use CSS Grid or Flexbox for layout.</>,
-    msgParseError: "Could not parse file. Please check for syntax errors.",
-    msgEmptyButton: "Empty button found without aria-label.",
-    msgAvoidPhysicalProp: (key) => <>Avoid physical property <span className="en-code">'{key}'</span>. Use logical properties (e.g., marginInlineStart).</>,
-    msgAvoidBorderRadiusShorthand: "Avoid 4-value borderRadius shorthand. It is direction-sensitive.",
-    msgAvoidTextLeftRightClass: "Avoid 'text-left'/'text-right'. Use logical alignment.",
-    msgAvoidPhysicalMarginPaddingClass: "Avoid physical margin/padding (ml-, mr-). Use logical properties (ms-, me-).",
+      // Meta / SEO
+      MISSING_META_CHARSET: {
+        ui: (
+          <>
+            Missing <span className="en-code">&lt;meta charset='utf-8'&gt;</span>{" "}
+            tag for proper character encoding.
+          </>
+        ),
+        text: "Missing <meta charset='utf-8'> tag for proper character encoding."
+      },
+      MISSING_META_VIEWPORT: {
+        ui: (
+          <>
+            Missing <span className="en-code">&lt;meta name='viewport'...&gt;</span>{" "}
+            tag for responsive design.
+          </>
+        ),
+        text: "Missing <meta name='viewport'...> tag for responsive design."
+      },
+      MISSING_META_DESCRIPTION: {
+        ui: (
+          <>
+            Missing{" "}
+            <span className="en-code">&lt;meta name='description'...&gt;</span> tag
+            for SEO.
+          </>
+        ),
+        text: "Missing <meta name='description'...> tag for SEO."
+      },
+      MISSING_META_KEYWORDS: {
+        ui: (
+          <>
+            Missing <span className="en-code">&lt;meta name='keywords'...&gt;</span>{" "}
+            tag for SEO.
+          </>
+        ),
+        text: "Missing <meta name='keywords'...> tag for SEO."
+      },
+      MISSING_META_AUTHOR: {
+        ui: (
+          <>
+            Missing <span className="en-code">&lt;meta name='author'...&gt;</span>{" "}
+            tag for SEO.
+          </>
+        ),
+        text: "Missing <meta name='author'...> tag for SEO."
+      },
+      MISSING_LANG_ATTRIBUTE: {
+        ui: (
+          <>
+            The <span className="en-code">&lt;html&gt;</span> tag is missing a{" "}
+            <span className="en-code">lang</span> attribute.
+          </>
+        ),
+        text: "The <html> tag is missing a lang attribute."
+      },
+      MISSING_DIR_ATTRIBUTE: {
+        ui: (
+          <>
+            The <span className="en-code">&lt;html&gt;</span> tag is missing a{" "}
+            <span className="en-code">dir</span> attribute.
+          </>
+        ),
+        text: "The <html> tag is missing a dir attribute."
+      },
 
-    // --- CSS WARNINGS ---
-    fixScroll: <>Added <span className="en-code">scroll-behavior: smooth</span> to html for better user experience.</>,
-    fixMarginLeft: <>Replaced <span className="en-code">margin-left</span> with <span className="en-code">margin-inline-start</span> to automatically flip spacing in RTL mode.</>,
-    fixMarginRight: <>Replaced <span className="en-code">margin-right</span> with <span className="en-code">margin-inline-end</span> to automatically flip spacing in RTL mode.</>,
-    fixPaddingLeft: <>Replaced <span className="en-code">padding-left</span> with <span className="en-code">padding-inline-start</span> to support RTL.</>,
-    fixPaddingRight: <>Replaced <span className="en-code">padding-right</span> with <span className="en-code">padding-inline-end</span> to support RTL.</>,
-    fixTextAlign: <>Replaced <span className="en-code">text-align: left/right</span> with <span className="en-code">start/end</span> so text aligns correctly in Arabic.</>,
-    warnPx: <>Found fixed <span className="en-code">px</span> values larger than 10px. Use <span className="en-code">rem</span> for fonts and spacing.</>,
-    fixBorderLeft: <>Replaced <span className="en-code">border-left</span> with <span className="en-code">border-inline-start</span>.</>,
-    fixBorderRight: <>Replaced <span className="en-code">border-right</span> with <span className="en-code">border-inline-end</span>.</>,
-    fixBorderTopLeftRadius: <>Fixed <span className="en-code">border-top-left-radius</span> to logical <span className="en-code">border-start-start-radius</span>.</>,
-    fixBorderTopRightRadius: <>Fixed <span className="en-code">border-top-right-radius</span> to logical <span className="en-code">border-start-end-radius</span>.</>,
-    fixBorderBottomRightRadius: <>Fixed <span className="en-code">border-bottom-right-radius</span> to logical <span className="en-code">border-end-end-radius</span>.</>,
-    fixBorderBottomLeftRadius: <>Fixed <span className="en-code">border-bottom-left-radius</span> to logical <span className="en-code">border-end-start-radius</span>.</>,
-    fixBorderRadiusShorthand: <>Converted physical <span className="en-code">border-radius</span> shorthand to logical properties.</>,
-    fixLeftPosition: <>Fixed absolute positioning <span className="en-code">left</span> to <span className="en-code">inset-inline-start</span>.</>,
-    fixRightPosition: <>Fixed absolute positioning <span className="en-code">right</span> to <span className="en-code">inset-inline-end</span>.</>,
+      // Logic / Config
+      MISSING_LANG_LOGIC: {
+        ui: "Main App file seems to be missing Language Context or dynamic direction logic.",
+        text: "Main App file seems to be missing Language Context or dynamic direction logic."
+      },
+      PARSE_ERROR: {
+        ui: "Could not parse file. Please check for syntax errors.",
+        text: "Could not parse file. Please check for syntax errors."
+      },
+
+      // RTL Styling Warnings
+      AVOID_TEXT_ALIGN: {
+        ui: (
+          <>
+            Avoid <span className="en-code">text-align: left/right</span>. Use{" "}
+            <span className="en-code">start/end</span> for RTL support.
+          </>
+        ),
+        text: "Avoid text-align: left/right. Use start/end for RTL support."
+      },
+      AVOID_FLOAT: {
+        ui: (
+          <>
+            Avoid <span className="en-code">float: left/right</span>. Use CSS Grid
+            or Flexbox for layout.
+          </>
+        ),
+        text: "Avoid float: left/right. Use CSS Grid or Flexbox for layout."
+      },
+      AVOID_PHYSICAL_PROP: (key) => ({
+        ui: (
+          <>
+            Avoid physical property <span className="en-code">'{key}'</span>. Use
+            logical properties (e.g., marginInlineStart).
+          </>
+        ),
+        text: `Avoid physical property '${key}'. Use logical properties (e.g., marginInlineStart).`
+      }),
+      AVOID_BORDER_RADIUS_SHORTHAND: {
+        ui: "Avoid 4-value borderRadius shorthand. It is direction-sensitive.",
+        text: "Avoid 4-value borderRadius shorthand. It is direction-sensitive."
+      },
+      AVOID_TEXT_LEFT_RIGHT_CLASS: {
+        ui: "Avoid 'text-left'/'text-right'. Use logical alignment.",
+        text: "Avoid 'text-left'/'text-right'. Use logical alignment."
+      },
+      AVOID_PHYSICAL_MARGIN_PADDING_CLASS: {
+        ui: "Avoid physical margin/padding (ml-, mr-). Use logical properties (ms-, me-).",
+        text: "Avoid physical margin/padding (ml-, mr-). Use logical properties (ms-, me-)."
+      },
+
+      // CSS Fixes/Warnings
+      FIX_SCROLL: {
+        ui: (
+          <>
+            Added <span className="en-code">scroll-behavior: smooth</span> to html
+            for better user experience.
+          </>
+        ),
+        text: "Added scroll-behavior: smooth to html for better user experience."
+      },
+      FIX_MARGIN_LEFT: {
+        ui: (
+          <>
+            Found physical property <span className="en-code">margin-left</span>.
+            Use <span className="en-code">margin-inline-start</span> for RTL
+            support.
+          </>
+        ),
+        text: "Found physical property margin-left. Use margin-inline-start for RTL support."
+      },
+      FIX_MARGIN_RIGHT: {
+        ui: (
+          <>
+            Found physical property <span className="en-code">margin-right</span>.
+            Use <span className="en-code">margin-inline-end</span> for RTL support.
+          </>
+        ),
+        text: "Found physical property margin-right. Use margin-inline-end for RTL support."
+      },
+      FIX_PADDING_LEFT: {
+        ui: (
+          <>
+            Found physical property <span className="en-code">padding-left</span>.
+            Use <span className="en-code">padding-inline-start</span> for RTL
+            support.
+          </>
+        ),
+        text: "Found physical property padding-left. Use padding-inline-start for RTL support."
+      },
+      FIX_PADDING_RIGHT: {
+        ui: (
+          <>
+            Found physical property <span className="en-code">padding-right</span>.
+            Use <span className="en-code">padding-inline-end</span> for RTL support.
+          </>
+        ),
+        text: "Found physical property padding-right. Use padding-inline-end for RTL support."
+      },
+      FIX_TEXT_ALIGN: {
+        ui: (
+          <>
+            Found hardcoded <span className="en-code">text-align</span>. Use{" "}
+            <span className="en-code">start/end</span> to align correctly in Arabic.
+          </>
+        ),
+        text: "Found hardcoded text-align. Use start/end to align correctly in Arabic."
+      },
+      FIX_FLOAT: {
+        ui: (
+          <>
+            Found physical float. Use{" "}
+            <span className="en-code">inline-start/inline-end</span>.
+          </>
+        ),
+        text: "Found physical float. Use inline-start/inline-end."
+      },
+      WARN_PX: {
+        ui: (
+          <>
+            Found fixed <span className="en-code">px</span> values larger than 10px.
+            Use <span className="en-code">rem</span> for fonts and spacing.
+          </>
+        ),
+        text: "Found fixed px values larger than 10px. Use rem for fonts and spacing."
+      },
+      FIX_BORDER_LEFT: {
+        ui: (
+          <>
+            Found physical <span className="en-code">border-left</span>. Use{" "}
+            <span className="en-code">border-inline-start</span>.
+          </>
+        ),
+        text: "Found physical border-left. Use border-inline-start."
+      },
+      FIX_BORDER_RIGHT: {
+        ui: (
+          <>
+            Found physical <span className="en-code">border-right</span>. Use{" "}
+            <span className="en-code">border-inline-end</span>.
+          </>
+        ),
+        text: "Found physical border-right. Use border-inline-end."
+      },
+      FIX_BORDER_TOP_LEFT_RADIUS: {
+        ui: (
+          <>
+            Found physical <span className="en-code">border-top-left-radius</span>.
+            Use <span className="en-code">border-start-start-radius</span>.
+          </>
+        ),
+        text: "Found physical border-top-left-radius. Use border-start-start-radius."
+      },
+      FIX_BORDER_TOP_RIGHT_RADIUS: {
+        ui: (
+          <>
+            Found physical <span className="en-code">border-top-right-radius</span>.
+            Use <span className="en-code">border-start-end-radius</span>.
+          </>
+        ),
+        text: "Found physical border-top-right-radius. Use border-start-end-radius."
+      },
+      FIX_BORDER_BOTTOM_RIGHT_RADIUS: {
+        ui: (
+          <>
+            Found physical{" "}
+            <span className="en-code">border-bottom-right-radius</span>. Use{" "}
+            <span className="en-code">border-end-end-radius</span>.
+          </>
+        ),
+        text: "Found physical border-bottom-right-radius. Use border-end-end-radius."
+      },
+      FIX_BORDER_BOTTOM_LEFT_RADIUS: {
+        ui: (
+          <>
+            Found physical{" "}
+            <span className="en-code">border-bottom-left-radius</span>. Use{" "}
+            <span className="en-code">border-end-start-radius</span>.
+          </>
+        ),
+        text: "Found physical border-bottom-left-radius. Use border-end-start-radius."
+      },
+      FIX_BORDER_RADIUS_SHORTHAND: {
+        ui: (
+          <>
+            Found physical <span className="en-code">border-radius</span> shorthand.
+            Use logical properties.
+          </>
+        ),
+        text: "Found physical border-radius shorthand. Use logical properties."
+      },
+      FIX_LEFT_POSITION: {
+        ui: (
+          <>
+            Found physical positioning <span className="en-code">left</span>. Use{" "}
+            <span className="en-code">inset-inline-start</span>.
+          </>
+        ),
+        text: "Found physical positioning left. Use inset-inline-start."
+      },
+      FIX_RIGHT_POSITION: {
+        ui: (
+          <>
+            Found physical positioning <span className="en-code">right</span>. Use{" "}
+            <span className="en-code">inset-inline-end</span>.
+          </>
+        ),
+        text: "Found physical positioning right. Use inset-inline-end."
+      }
+    },
 
     // New Blog Specific Labels
-    blogSubtitle: "Your comprehensive guide to Accessibility, RTL support, and Modern CSS.",
+    blogSubtitle:
+      "Your comprehensive guide to Accessibility, RTL support, and Modern CSS.",
     blogFixLabel: "💡 The Fix:",
     videoWatch: "Watch:",
 
@@ -90,7 +421,7 @@ export const content = {
         code: CODE_SNIPPETS.structure,
         language: "html",
         videoUrl: "https://www.youtube.com/watch?v=vAAzdi1xuUY",
-        videoTitle: "Why headings and landmarks are so important"
+        videoTitle: "Why headings and landmarks are so important",
       },
       {
         id: 2,
@@ -100,7 +431,7 @@ export const content = {
         code: CODE_SNIPPETS.images,
         language: "html",
         videoUrl: "https://youtu.be/JP2VkfYF5HU?si=-ZD5xE142ZG8ClGn&t=166",
-        videoTitle: "Why you should start using ARIA Attributes in HTML"
+        videoTitle: "Why you should start using ARIA Attributes in HTML",
       },
       {
         id: 3,
@@ -110,7 +441,7 @@ export const content = {
         code: CODE_SNIPPETS.logicalProperties,
         language: "css",
         videoUrl: "https://www.youtube.com/watch?v=wPvXHiHHSgY",
-        videoTitle: "Everything you need to know about CSS Logical Properties"
+        videoTitle: "Everything you need to know about CSS Logical Properties",
       },
       {
         id: 4,
@@ -120,7 +451,8 @@ export const content = {
         code: CODE_SNIPPETS.remUnits,
         language: "css",
         videoUrl: "https://www.youtube.com/watch?v=okw-whFWGEo",
-        videoTitle: "Stop using pixels in your CSS! How and why to use REM and EM."
+        videoTitle:
+          "Stop using pixels in your CSS! How and why to use REM and EM.",
       },
       {
         id: 5,
@@ -130,7 +462,7 @@ export const content = {
         code: CODE_SNIPPETS.langDir,
         language: "html",
         videoUrl: "https://www.youtube.com/watch?v=cOmehxAU_4s",
-        videoTitle: "How I do an accessibility check"
+        videoTitle: "How I do an accessibility check",
       },
       {
         id: 6,
@@ -140,7 +472,7 @@ export const content = {
         code: CODE_SNIPPETS.metaTags,
         language: "html",
         videoUrl: "https://www.youtube.com/watch?v=WecWWZifXB4",
-        videoTitle: "Learn HTML Meta-Tags in 4 Minutes!"
+        videoTitle: "Learn HTML Meta-Tags in 4 Minutes!",
       },
       {
         id: 7,
@@ -150,9 +482,9 @@ export const content = {
         code: CODE_SNIPPETS.textAlign,
         language: "css",
         videoUrl: "https://www.youtube.com/watch?v=wPvXHiHHSgY",
-        videoTitle: "Everything you need to know about CSS Logical Properties"
-      }
-    ]
+        videoTitle: "Everything you need to know about CSS Logical Properties",
+      },
+    ],
   },
 
   ar: {
@@ -160,13 +492,16 @@ export const content = {
     contact: "تواصل معنا",
     toggleBtn: "EN",
     heroText: "ظبط محركات البحث و التعريب بشكل مبسط.",
-    heropar: "فحوصات فورية لمحركات البحث، الخطوط، وسهولة الوصول. نصائح للإصلاح + معاينة مباشرة.",
+    heropar:
+      "فحوصات فورية لمحركات البحث، الخطوط، وسهولة الوصول. نصائح للإصلاح + معاينة مباشرة.",
     herobtn1: "جرب فحص سريع",
     herobtn2: "عرض المصدر",
     downloadFixed: "تحميل الكود المصحح",
+    downloadReport: "تحميل تقرير JSON",
     analyzeBtn: "تحليل الكود",
     score: "النقاط:",
-    copyrights: "© 2025 عَرِّب. جميع الحقوق محفوظة.",
+    totalScore: "نسبة التعريب الكلية",
+    copyrights: "© 2025 عَرِّب. مفتوح المصدر (رخصة MIT).",
     upFile: "رفع ملف",
     fileUped: "تم رفع الملف (تغيير؟)",
     analyzing: "جاري التحليل...",
@@ -177,58 +512,386 @@ export const content = {
     uploadFolder: "رفع مجلد",
     upload: "رفع",
     files: "ملفات",
+    dragHint: "اسحب وأفلت الملفات أو المجلدات هنا",
+    supportedTypes: "ندعم: .html, .css, .js, .jsx, والصور",
+
+    // Wizard
+    wizardTitle: "إعدادات التحليل",
+    modeSelect: "اختر وضع التحليل",
+    modeScan: "فحص سريع (تقرير فقط)",
+    modeFixCSS: "إصلاح تلقائي للـ CSS فقط",
+    modeFixLang: "إضافة زر اللغة فقط",
+    modeBestPractices: "أفضل الممارسات (A11Y)",
+    modeFixAll: "إصلاح شامل (CSS + زر اللغة)",
+    modeFullWithBestPractices: "إصلاح شامل + أفضل الممارسات",
+    modeMultiLang: "إعداد وتدقيق تعدد اللغات",
+    configFiles: "إعدادات المشروع",
+    mainJs: "ملف React الرئيسي (مثل App.js)",
+    mainHtml: "ملف HTML الرئيسي (مثل index.html)",
+    startBtn: "ابـدأ التحليل",
+    projectType: "نوع المشروع",
+    typeReact: "React.js",
+    typeVanilla: "إعتيادي (HTML/CSS/JS)",
+    cancelBtn: "إلغاء",
 
     errtypeStructure: "هيكلية الصفحة",
+    errPreSemantic: "لم نتمكن من العثور على وسم",
+    errPostSemantic: "في المشروع بالكامل.",
     errtypeAlt: "سهولة الوصول",
     errtypeMeta: "تحسين محركات البحث (SEO)",
     errtypeLanguage: "إعدادات اللغة",
     errtypeRTL: "دعم العربية (RTL)",
     errtypeResponsiveness: "التجاوب",
 
-    // --- HTML WARNINGS (Arabic with Fixed English Direction) ---
-    msgMissingHeader: <>لم نتمكن من العثور على وسم <span className="en-code">&lt;header&gt;</span>. فكر في استبدال <span className="en-code">&lt;div className='header'&gt;</span> بـ <span className="en-code">&lt;header&gt;</span>.</>,
-    msgMissingNav: <>لم نتمكن من العثور على وسم <span className="en-code">&lt;nav&gt;</span>. فكر في استبدال <span className="en-code">&lt;div className='nav'&gt;</span> بـ <span className="en-code">&lt;nav&gt;</span>.</>,
-    msgMissingFooter: <>لم نتمكن من العثور على وسم <span className="en-code">&lt;footer&gt;</span>. فكر في إضافة واحد لتحسين الهيكلية.</>,
+    // --- ERROR DEFINITIONS (Structured for UI & JSON) ---
+    errors: {
+      // Structure
+      MISSING_HEADER: {
+        ui: (
+          <>
+            لم نتمكن من العثور على وسم <span className="en-code">&lt;header&gt;</span>.
+            فكر في استبدال{" "}
+            <span className="en-code">&lt;div className='header'&gt;</span> بـ{" "}
+            <span className="en-code">&lt;header&gt;</span>.
+          </>
+        ),
+        text: "لم نتمكن من العثور على وسم <header>. فكر في استبدال <div class='header'> بـ <header>."
+      },
+      MISSING_NAV: {
+        ui: (
+          <>
+            لم نتمكن من العثور على وسم <span className="en-code">&lt;nav&gt;</span>.
+            فكر في استبدال{" "}
+            <span className="en-code">&lt;div className='nav'&gt;</span> بـ{" "}
+            <span className="en-code">&lt;nav&gt;</span>.
+          </>
+        ),
+        text: "لم نتمكن من العثور على وسم <nav>. فكر في استبدال <div class='nav'> بـ <nav>."
+      },
+      MISSING_FOOTER: {
+        ui: (
+          <>
+            لم نتمكن من العثور على وسم{" "}
+            <span className="en-code">&lt;footer&gt;</span>. فكر في إضافة واحد
+            لتحسين الهيكلية.
+          </>
+        ),
+        text: "لم نتمكن من العثور على وسم <footer>. فكر في إضافة واحد لتحسين الهيكلية."
+      },
+      MISSING_MAIN: {
+        ui: (
+          <>
+            لم نتمكن من العثور على وسم <span className="en-code">&lt;main&gt;</span>
+            . فكر في تغليف المحتوى الرئيسي بـ{" "}
+            <span className="en-code">&lt;main&gt;</span>.
+          </>
+        ),
+        text: "لم نتمكن من العثور على وسم <main>. فكر في تغليف المحتوى الرئيسي بـ <main>."
+      },
+      GLOBAL_MISSING_TAG: (tag) => ({
+        ui: (
+          <>
+            لم نتمكن من العثور على وسم <span className="en-code">{tag}</span> في
+            المشروع بالكامل. (فحص شامل)
+          </>
+        ),
+        text: `لم نتمكن من العثور على وسم ${tag} في المشروع بالكامل. (فحص شامل)`
+      }),
 
-    // FUNCTION
-    msgMissingAlt: (id) => <>الصورة رقم <span className="en-code">#{id}</span> تفتقد وسم <span className="en-code">alt</span>.</>,
+      // Accessibility
+      MISSING_ALT: (id) => ({
+        ui: (
+          <>
+            الصورة رقم <span className="en-code">#{id}</span> تفتقد وسم{" "}
+            <span className="en-code">alt</span>.
+          </>
+        ),
+        text: `الصورة رقم #${id} تفتقد وسم alt.`
+      }),
+      EMPTY_BUTTON: {
+        ui: "تم العثور على زر فارغ بدون تسمية (aria-label).",
+        text: "تم العثور على زر فارغ بدون تسمية (aria-label)."
+      },
 
-    msgMissingMetaCharset: <>يفتقد وسم <span className="en-code">&lt;meta charset='utf-8'&gt;</span> لترميز الأحرف بشكل صحيح.</>,
-    msgMissingMetaViewport: <>يفتقد وسم <span className="en-code">&lt;meta name='viewport'...&gt;</span> لتصميم متجاوب.</>,
-    msgMissingMetaDescription: <>يفتقد وسم <span className="en-code">&lt;meta name='description'...&gt;</span> لضبط محركات البحث.</>,
-    msgMissingMetaKeywords: <>يفتقد وسم <span className="en-code">&lt;meta name='keywords'...&gt;</span> لضبط محركات البحث.</>,
-    msgMissingMetaAuthor: <>يفتقد وسم <span className="en-code">&lt;meta name='author'...&gt;</span> لضبط محركات البحث.</>,
-    msgMissingLangAttribute: <>وسم <span className="en-code">&lt;html&gt;</span> يفتقد وسم <span className="en-code">lang</span>.</>,
-    msgMissingDirAttribute: <>وسم <span className="en-code">&lt;html&gt;</span> يفتقد وسم <span className="en-code">dir</span>.</>,
-    msgAvoidTextAlign: <>تجنب استخدام <span className="en-code">text-align: left/right</span>. استخدم <span className="en-code">start/end</span> لدعم العربية.</>,
-    msgAvoidFloat: <>تجنب استخدام <span className="en-code">float: left/right</span>. استخدم CSS Grid أو Flexbox للتخطيط.</>,
-    msgParseError: "لم نتمكن من تحليل الملف. يرجى التحقق من وجود أخطاء في بناء الجملة.",
-    msgEmptyButton: "تم العثور على زر فارغ بدون تسمية (aria-label).",
-    msgAvoidPhysicalProp: (key) => <>تجنب الخاصية المادية <span className="en-code">'{key}'</span>. استخدم الخصائص المنطقية (مثل marginInlineStart).</>,
-    msgAvoidBorderRadiusShorthand: "تجنب اختصار borderRadius بـ 4 قيم. إنه حساس للاتجاه.",
-    msgAvoidTextLeftRightClass: "تجنب 'text-left'/'text-right'. استخدم المحاذاة المنطقية.",
-    msgAvoidPhysicalMarginPaddingClass: "تجنب هوامش/حواشي مادية (ml-, mr-). استخدم خصائص منطقية (ms-, me-).",
+      // Meta / SEO
+      MISSING_META_CHARSET: {
+        ui: (
+          <>
+            يفتقد وسم <span className="en-code">&lt;meta charset='utf-8'&gt;</span>{" "}
+            لترميز الأحرف بشكل صحيح.
+          </>
+        ),
+        text: "يفتقد وسم <meta charset='utf-8'> لترميز الأحرف بشكل صحيح."
+      },
+      MISSING_META_VIEWPORT: {
+        ui: (
+          <>
+            يفتقد وسم{" "}
+            <span className="en-code">&lt;meta name='viewport'...&gt;</span> لتصميم
+            متجاوب.
+          </>
+        ),
+        text: "يفتقد وسم <meta name='viewport'...> لتصميم متجاوب."
+      },
+      MISSING_META_DESCRIPTION: {
+        ui: (
+          <>
+            يفتقد وسم{" "}
+            <span className="en-code">&lt;meta name='description'...&gt;</span> لضبط
+            محركات البحث.
+          </>
+        ),
+        text: "يفتقد وسم <meta name='description'...> لضبط محركات البحث."
+      },
+      MISSING_META_KEYWORDS: {
+        ui: (
+          <>
+            يفتقد وسم{" "}
+            <span className="en-code">&lt;meta name='keywords'...&gt;</span> لضبط
+            محركات البحث.
+          </>
+        ),
+        text: "يفتقد وسم <meta name='keywords'...> لضبط محركات البحث."
+      },
+      MISSING_META_AUTHOR: {
+        ui: (
+          <>
+            يفتقد وسم <span className="en-code">&lt;meta name='author'...&gt;</span>{" "}
+            لضبط محركات البحث.
+          </>
+        ),
+        text: "يفتقد وسم <meta name='author'...> لضبط محركات البحث."
+      },
+      MISSING_LANG_ATTRIBUTE: {
+        ui: (
+          <>
+            وسم <span className="en-code">&lt;html&gt;</span> يفتقد وسم{" "}
+            <span className="en-code">lang</span>.
+          </>
+        ),
+        text: "وسم <html> يفتقد وسم lang."
+      },
+      MISSING_DIR_ATTRIBUTE: {
+        ui: (
+          <>
+            وسم <span className="en-code">&lt;html&gt;</span> يفتقد وسم{" "}
+            <span className="en-code">dir</span>.
+          </>
+        ),
+        text: "وسم <html> يفتقد وسم dir."
+      },
 
-    // --- CSS WARNINGS ---
-    fixScroll: <>تم إضافة <span className="en-code">scroll-behavior: smooth</span> لتحسين تجربة التمرير.</>,
-    fixMarginLeft: <>تم استبدال <span className="en-code">margin-left</span> بـ <span className="en-code">margin-inline-start</span> لقلب المسافات تلقائياً في العربية.</>,
-    fixMarginRight: <>تم استبدال <span className="en-code">margin-right</span> بـ <span className="en-code">margin-inline-end</span> لقلب المسافات تلقائياً في العربية.</>,
-    fixPaddingLeft: <>تم استبدال <span className="en-code">padding-left</span> بـ <span className="en-code">padding-inline-start</span> لدعم الاتجاهين.</>,
-    fixPaddingRight: <>تم استبدال <span className="en-code">padding-right</span> بـ <span className="en-code">padding-inline-end</span> لدعم الاتجاهين.</>,
-    fixTextAlign: <>تم استبدال <span className="en-code">text-align</span> بـ <span className="en-code">start/end</span> لضمان محاذاة النص بشكل صحيح.</>,
-    warnPx: <>تم العثور على قيم <span className="en-code">px</span> أكبر من 10px. استخدم <span className="en-code">rem</span> للخطوط والمسافات.</>,
-    fixBorderLeft: <>تم استبدال <span className="en-code">border-left</span> بـ <span className="en-code">border-inline-start</span>.</>,
-    fixBorderRight: <>تم استبدال <span className="en-code">border-right</span> بـ <span className="en-code">border-inline-end</span>.</>,
-    fixBorderTopLeftRadius: <>تم إصلاح <span className="en-code">border-top-left-radius</span> إلى <span className="en-code">border-start-start-radius</span> المنطقي.</>,
-    fixBorderTopRightRadius: <>تم إصلاح <span className="en-code">border-top-right-radius</span> إلى <span className="en-code">border-start-end-radius</span> المنطقي.</>,
-    fixBorderBottomRightRadius: <>تم إصلاح <span className="en-code">border-bottom-right-radius</span> إلى <span className="en-code">border-end-end-radius</span> المنطقي.</>,
-    fixBorderBottomLeftRadius: <>تم إصلاح <span className="en-code">border-bottom-left-radius</span> إلى <span className="en-code">border-end-start-radius</span> المنطقي.</>,
-    fixBorderRadiusShorthand: <>تم تحويل اختصار <span className="en-code">border-radius</span> المادي إلى خصائص منطقية.</>,
-    fixLeftPosition: <>تم إصلاح التموضع المطلق <span className="en-code">left</span> إلى <span className="en-code">inset-inline-start</span>.</>,
-    fixRightPosition: <>تم إصلاح التموضع المطلق <span className="en-code">right</span> إلى <span className="en-code">inset-inline-end</span>.</>,
+      // Logic / Config
+      MISSING_LANG_LOGIC: {
+        ui: "يبدو أن ملف التطبيق الرئيسي يفتقد سياق اللغة أو منطق الاتجاه الديناميكي.",
+        text: "يبدو أن ملف التطبيق الرئيسي يفتقد سياق اللغة أو منطق الاتجاه الديناميكي."
+      },
+      PARSE_ERROR: {
+        ui: "لم نتمكن من تحليل الملف. يرجى التحقق من وجود أخطاء في بناء الجملة.",
+        text: "لم نتمكن من تحليل الملف. يرجى التحقق من وجود أخطاء في بناء الجملة."
+      },
+
+      // RTL Styling
+      AVOID_TEXT_ALIGN: {
+        ui: (
+          <>
+            تجنب استخدام <span className="en-code">text-align: left/right</span>.
+            استخدم <span className="en-code">start/end</span> لدعم العربية.
+          </>
+        ),
+        text: "تجنب استخدام text-align: left/right. استخدم start/end لدعم العربية."
+      },
+      AVOID_FLOAT: {
+        ui: (
+          <>
+            تجنب استخدام <span className="en-code">float: left/right</span>. استخدم
+            CSS Grid أو Flexbox للتخطيط.
+          </>
+        ),
+        text: "تجنب استخدام float: left/right. استخدم CSS Grid أو Flexbox للتخطيط."
+      },
+      AVOID_PHYSICAL_PROP: (key) => ({
+        ui: (
+          <>
+            تجنب الخاصية المادية <span className="en-code">'{key}'</span>. استخدم
+            الخصائص المنطقية (مثل marginInlineStart).
+          </>
+        ),
+        text: `تجنب الخاصية المادية '${key}'. استخدم الخصائص المنطقية (مثل marginInlineStart).`
+      }),
+      AVOID_BORDER_RADIUS_SHORTHAND: {
+        ui: "تجنب اختصار borderRadius بـ 4 قيم. إنه حساس للاتجاه.",
+        text: "تجنب اختصار borderRadius بـ 4 قيم. إنه حساس للاتجاه."
+      },
+      AVOID_TEXT_LEFT_RIGHT_CLASS: {
+        ui: "تجنب 'text-left'/'text-right'. استخدم المحاذاة المنطقية.",
+        text: "تجنب 'text-left'/'text-right'. استخدم المحاذاة المنطقية."
+      },
+      AVOID_PHYSICAL_MARGIN_PADDING_CLASS: {
+        ui: "تجنب هوامش/حواشي مادية (ml-, mr-). استخدم خصائص منطقية (ms-, me-).",
+        text: "تجنب هوامش/حواشي مادية (ml-, mr-). استخدم خصائص منطقية (ms-, me-)."
+      },
+
+      // CSS Fixes/Warnings
+      FIX_SCROLL: {
+        ui: (
+          <>
+            تم إضافة <span className="en-code">scroll-behavior: smooth</span> لتحسين
+            تجربة التمرير.
+          </>
+        ),
+        text: "تم إضافة scroll-behavior: smooth لتحسين تجربة التمرير."
+      },
+      FIX_MARGIN_LEFT: {
+        ui: (
+          <>
+            تم العثور على <span className="en-code">margin-left</span>. استخدم{" "}
+            <span className="en-code">margin-inline-start</span> لدعم العربية.
+          </>
+        ),
+        text: "تم العثور على margin-left. استخدم margin-inline-start لدعم العربية."
+      },
+      FIX_MARGIN_RIGHT: {
+        ui: (
+          <>
+            تم العثور على <span className="en-code">margin-right</span>. استخدم{" "}
+            <span className="en-code">margin-inline-end</span> لدعم العربية.
+          </>
+        ),
+        text: "تم العثور على margin-right. استخدم margin-inline-end لدعم العربية."
+      },
+      FIX_PADDING_LEFT: {
+        ui: (
+          <>
+            تم العثور على <span className="en-code">padding-left</span>. استخدم{" "}
+            <span className="en-code">padding-inline-start</span> لدعم العربية.
+          </>
+        ),
+        text: "تم العثور على padding-left. استخدم padding-inline-start لدعم العربية."
+      },
+      FIX_PADDING_RIGHT: {
+        ui: (
+          <>
+            تم العثور على <span className="en-code">padding-right</span>. استخدم{" "}
+            <span className="en-code">padding-inline-end</span> لدعم العربية.
+          </>
+        ),
+        text: "تم العثور على padding-right. استخدم padding-inline-end لدعم العربية."
+      },
+      FIX_TEXT_ALIGN: {
+        ui: (
+          <>
+            تم العثور على <span className="en-code">text-align</span> ثابت. استخدم{" "}
+            <span className="en-code">start/end</span> لضمان المحاذاة الصحيحة.
+          </>
+        ),
+        text: "تم العثور على text-align ثابت. استخدم start/end لضمان المحاذاة الصحيحة."
+      },
+      FIX_FLOAT: {
+        ui: (
+          <>
+            تم العثور على <span className="en-code">float</span> مادي. استخدم{" "}
+            <span className="en-code">inline-start/inline-end</span>.
+          </>
+        ),
+        text: "تم العثور على float مادي. استخدم inline-start/inline-end."
+      },
+      WARN_PX: {
+        ui: (
+          <>
+            تم العثور على قيم <span className="en-code">px</span> أكبر من 10px.
+            استخدم <span className="en-code">rem</span> للخطوط والمسافات.
+          </>
+        ),
+        text: "تم العثور على قيم px أكبر من 10px. استخدم rem للخطوط والمسافات."
+      },
+      FIX_BORDER_LEFT: {
+        ui: (
+          <>
+            تم العثور على <span className="en-code">border-left</span> مادي. استخدم{" "}
+            <span className="en-code">border-inline-start</span>.
+          </>
+        ),
+        text: "تم العثور على border-left مادي. استخدم border-inline-start."
+      },
+      FIX_BORDER_RIGHT: {
+        ui: (
+          <>
+            تم العثور على <span className="en-code">border-right</span> مادي. استخدم{" "}
+            <span className="en-code">border-inline-end</span>.
+          </>
+        ),
+        text: "تم العثور على border-right مادي. استخدم border-inline-end."
+      },
+      FIX_BORDER_TOP_LEFT_RADIUS: {
+        ui: (
+          <>
+            تم العثور على <span className="en-code">border-top-left-radius</span>{" "}
+            مادي. استخدم <span className="en-code">border-start-start-radius</span>.
+          </>
+        ),
+        text: "تم العثور على border-top-left-radius مادي. استخدم border-start-start-radius."
+      },
+      FIX_BORDER_TOP_RIGHT_RADIUS: {
+        ui: (
+          <>
+            تم العثور على <span className="en-code">border-top-right-radius</span>{" "}
+            مادي. استخدم <span className="en-code">border-start-end-radius</span>.
+          </>
+        ),
+        text: "تم العثور على border-top-right-radius مادي. استخدم border-start-end-radius."
+      },
+      FIX_BORDER_BOTTOM_RIGHT_RADIUS: {
+        ui: (
+          <>
+            تم العثور على{" "}
+            <span className="en-code">border-bottom-right-radius</span> مادي. استخدم{" "}
+            <span className="en-code">border-end-end-radius</span>.
+          </>
+        ),
+        text: "تم العثور على border-bottom-right-radius مادي. استخدم border-end-end-radius."
+      },
+      FIX_BORDER_BOTTOM_LEFT_RADIUS: {
+        ui: (
+          <>
+            تم العثور على <span className="en-code">border-bottom-left-radius</span>{" "}
+            مادي. استخدم <span className="en-code">border-end-start-radius</span>.
+          </>
+        ),
+        text: "تم العثور على border-bottom-left-radius مادي. استخدم border-end-start-radius."
+      },
+      FIX_BORDER_RADIUS_SHORTHAND: {
+        ui: (
+          <>
+            تم العثور على اختصار <span className="en-code">border-radius</span>{" "}
+            مادي. استخدم الخصائص المنطقية.
+          </>
+        ),
+        text: "تم العثور على اختصار border-radius مادي. استخدم الخصائص المنطقية."
+      },
+      FIX_LEFT_POSITION: {
+        ui: (
+          <>
+            تم العثور على تموضع <span className="en-code">left</span>. استخدم{" "}
+            <span className="en-code">inset-inline-start</span>.
+          </>
+        ),
+        text: "تم العثور على تموضع left. استخدم inset-inline-start."
+      },
+      FIX_RIGHT_POSITION: {
+        ui: (
+          <>
+            تم العثور على تموضع <span className="en-code">right</span>. استخدم{" "}
+            <span className="en-code">inset-inline-end</span>.
+          </>
+        ),
+        text: "تم العثور على تموضع right. استخدم inset-inline-end."
+      }
+    },
 
     // New Blog Specific Labels
-    blogSubtitle: "دليلك الشامل لتحسين تجربة المستخدم، دعم العربية، وسهولة الوصول.",
+    blogSubtitle:
+      "دليلك الشامل لتحسين تجربة المستخدم، دعم العربية، وسهولة الوصول.",
     blogFixLabel: "💡 الحل:",
     videoWatch: "شاهد الشرح:",
 
@@ -242,7 +905,7 @@ export const content = {
         code: CODE_SNIPPETS.structure,
         language: "html",
         videoUrl: "https://www.youtube.com/watch?v=vAAzdi1xuUY",
-        videoTitle: "لماذا الهيكلية والدلالات مهمة"
+        videoTitle: "لماذا الهيكلية والدلالات مهمة",
       },
       {
         id: 2,
@@ -252,7 +915,7 @@ export const content = {
         code: CODE_SNIPPETS.images,
         language: "html",
         videoUrl: "https://youtu.be/JP2VkfYF5HU?si=-ZD5xE142ZG8ClGn&t=166",
-        videoTitle: "لماذا يجب عليك البدء في استخدام سمات ARIA في HTML"
+        videoTitle: "لماذا يجب عليك البدء في استخدام سمات ARIA في HTML",
       },
       {
         id: 3,
@@ -262,7 +925,7 @@ export const content = {
         code: CODE_SNIPPETS.logicalProperties,
         language: "css",
         videoUrl: "https://www.youtube.com/watch?v=wPvXHiHHSgY",
-        videoTitle: "كل ما تحتاج إلى معرفته حول خصائص CSS المنطقية"
+        videoTitle: "كل ما تحتاج إلى معرفته حول خصائص CSS المنطقية",
       },
       {
         id: 4,
@@ -272,7 +935,8 @@ export const content = {
         code: CODE_SNIPPETS.remUnits,
         language: "css",
         videoUrl: "https://www.youtube.com/watch?v=okw-whFWGEo",
-        videoTitle: "توقف عن استخدام البكسلات في CSS! كيف ولماذا تستخدم REM وEM؟"
+        videoTitle:
+          "توقف عن استخدام البكسلات في CSS! كيف ولماذا تستخدم REM وEM؟",
       },
       {
         id: 5,
@@ -282,7 +946,7 @@ export const content = {
         code: CODE_SNIPPETS.langDir,
         language: "html",
         videoUrl: "https://www.youtube.com/watch?v=cOmehxAU_4s",
-        videoTitle: "كيف أقوم بإجراء فحص إمكانية الوصول"
+        videoTitle: "كيف أقوم بإجراء فحص إمكانية الوصول",
       },
       {
         id: 6,
@@ -292,7 +956,7 @@ export const content = {
         code: CODE_SNIPPETS.metaTags,
         language: "html",
         videoUrl: "https://www.youtube.com/watch?v=WecWWZifXB4",
-        videoTitle: "تعلم علامات HTML التعريفية في 4 دقائق!"
+        videoTitle: "تعلم علامات HTML التعريفية في 4 دقائق!",
       },
       {
         id: 7,
@@ -302,9 +966,8 @@ export const content = {
         code: CODE_SNIPPETS.textAlign,
         language: "css",
         videoUrl: "https://www.youtube.com/watch?v=wPvXHiHHSgY",
-        videoTitle: "كل ما تحتاج إلى معرفته حول خصائص CSS المنطقية"
-      }
+        videoTitle: "كل ما تحتاج إلى معرفته حول خصائص CSS المنطقية",
+      },
     ],
-
-  }
+  },
 };

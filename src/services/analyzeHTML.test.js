@@ -49,9 +49,9 @@ describe('analyzeHTML', () => {
         expect(result.score).toBeLessThan(100);
         expect(result.warnings).toEqual(
             expect.arrayContaining([
-                expect.objectContaining({ msg: 'Missing Header' }),
-                expect.objectContaining({ msg: 'Missing Nav' }),
-                expect.objectContaining({ msg: 'Missing Footer' })
+                expect.objectContaining({ code: 'MISSING_HEADER' }),
+                expect.objectContaining({ code: 'MISSING_NAV' }),
+                expect.objectContaining({ code: 'MISSING_FOOTER' })
             ])
         );
     });
@@ -61,8 +61,8 @@ describe('analyzeHTML', () => {
         const result = analyzeHTML(html, mockText);
         expect(result.warnings).toEqual(
             expect.arrayContaining([
-                expect.objectContaining({ msg: 'Missing Charset' }),
-                expect.objectContaining({ msg: 'Missing Viewport' })
+                expect.objectContaining({ code: 'MISSING_META_CHARSET' }),
+                expect.objectContaining({ code: 'MISSING_META_VIEWPORT' })
             ])
         );
     });
@@ -72,24 +72,22 @@ describe('analyzeHTML', () => {
         const result = analyzeHTML(html, mockText);
         expect(result.warnings).toEqual(
             expect.arrayContaining([
-                expect.objectContaining({ msg: 'Missing Lang' }),
-                expect.objectContaining({ msg: 'Missing Dir' })
+                expect.objectContaining({ code: 'MISSING_LANG_ATTRIBUTE' }),
+                expect.objectContaining({ code: 'MISSING_DIR_ATTRIBUTE' })
             ])
         );
     });
 
-    test('detects missing alt attributes on images', () => {
-        const html = `
-      <html lang="en" dir="ltr">
-        <body>
-          <img src="foo.jpg">
-        </body>
-      </html>
-    `;
-        const result = analyzeHTML(html, mockText);
-        expect(result.warnings).toEqual(
+    // Alt attribute test moved to analyzeA11Y.test.js
+    test('skips structure checks if isReact is true', () => {
+        const html = '<!DOCTYPE html><html><body><div id="root"></div></body></html>';
+        const result = analyzeHTML(html, mockText, { isMainFile: true, isReact: true });
+        // Should NOT have structure warnings
+        expect(result.warnings).not.toEqual(
             expect.arrayContaining([
-                expect.objectContaining({ type: 'Alt Error' })
+                expect.objectContaining({ code: 'MISSING_HEADER' }),
+                expect.objectContaining({ code: 'MISSING_NAV' }),
+                expect.objectContaining({ code: 'MISSING_FOOTER' })
             ])
         );
     });
