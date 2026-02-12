@@ -55,7 +55,7 @@ export const injectProvider = (code) => {
 
     let lastImportEnd = 0;
     let foundImport = false;
-    let returnStatement = null;
+
     let jsxRoot = null;
     let alreadyInjected = false;
 
@@ -74,11 +74,11 @@ export const injectProvider = (code) => {
         },
         ReturnStatement: (node) => {
             if (node.argument && (node.argument.type === 'JSXElement' || node.argument.type === 'JSXFragment')) {
-                returnStatement = node;
+
                 jsxRoot = node.argument;
             } else if (node.argument && node.argument.type === 'ParenthesizedExpression' && 
                       (node.argument.expression.type === 'JSXElement' || node.argument.expression.type === 'JSXFragment')) {
-                returnStatement = node;
+
                 jsxRoot = node.argument.expression;
             }
         }

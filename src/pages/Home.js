@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useContext } from 'react';
+import { useState, useRef, useContext } from 'react';
 import SplitText from '../components/SplitText';
 import CodeWindow from '../components/CodeWindow';
 import analyzeHTML from '../services/analyzeHTML';
@@ -7,7 +7,7 @@ import analyzeJSX from '../services/analyzeJSX';
 import analyzeA11Y from '../services/analyzeA11Y';
 import ConfigWizard from '../components/ConfigWizard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faUpload, faFile, faFolderOpen, faCode, faFileAlt, faFileImage, faFileExport } from '@fortawesome/free-solid-svg-icons';
+import { faUpload, faFile, faFolderOpen, faCode, faFileAlt, faFileImage, faFileExport } from '@fortawesome/free-solid-svg-icons';
 import { faReact, faHtml5, faCss3, faGithub } from '@fortawesome/free-brands-svg-icons';
 import Confetti from 'react-confetti';
 import { Link } from 'react-router-dom';
@@ -133,9 +133,7 @@ const Home = () => {
       setUploadedFiles(prev => [...prev, ...processedFiles]);
   };
   
-  const handleUploadClick = () => {
-      fileInputRef.current.click();
-  };
+
 
 
   // Trigger Analysis (Shows Wizard First)

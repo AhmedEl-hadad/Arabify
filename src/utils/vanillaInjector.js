@@ -54,7 +54,7 @@ export const injectVanillaLogic = (htmlContent) => {
                 if(langLabel) langLabel.textContent = lang === 'ar' ? 'العربية' : 'English';
             }
         })();
-    <\/script>
+    </script>
     `;
 
     // 3. Inject
