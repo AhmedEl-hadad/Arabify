@@ -36,17 +36,7 @@ const LanguageToggle = () => {
     const { lang, toggleLanguage } = useContext(LanguageContext);
 
     return (
-        <button onClick={toggleLanguage} style={{
-            background: 'transparent',
-            border: '1px solid currentColor',
-            padding: '0.5rem 1rem',
-            borderRadius: '50px',
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            margin: '0 10px'
-        }}>
+        <button onClick={toggleLanguage}>
             <span>{lang === 'en' ? 'EN' : 'AR'}</span>
         </button>
     );

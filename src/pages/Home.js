@@ -179,7 +179,7 @@ const Home = () => {
         if (foundTags) foundTags.forEach(t => projectStats.foundTags.add(t));
         result = { ...result, score, warnings, fixedCode };
       } else if (file.type === 'css') {
-        const { score, warnings, fixedCSS } = await analyzeCSS(file.content, text);
+        const { score, warnings, fixedCSS } = await analyzeCSS(file.content, text, { isMainFile: true });
         // Only attach fixedCode if mode is 'fix' OR 'multi-lang'
         result = {
           ...result,
@@ -188,10 +188,16 @@ const Home = () => {
           fixedCode: (config.mode === 'fix-css' || config.mode === 'fix-all') ? fixedCSS : null
         };
       } else if (file.type === 'jsx') {
+        // Robust check for App File
+        const normalize = (p) => p.replace(/\\/g, '/').toLowerCase();
+        const configApp = config.appFileName.trim().toLowerCase();
+        const fileName = file.name.toLowerCase();
+        
+        const isApp = fileName === configApp || normalize(file.path).endsWith(`/${configApp}`);
+
         const { score, warnings, foundTags, fixedCode } = analyzeJSX(file.content, text, {
              mode: config.mode,
-             // Check exact name OR path ending (e.g. src/App.js)
-             isAppFile: (file.name === config.appFileName || file.path.endsWith(`/${config.appFileName}`)),
+             isAppFile: isApp,
              fileName: file.name
         });
         if (foundTags) foundTags.forEach(t => projectStats.foundTags.add(t));
@@ -305,11 +311,20 @@ const Home = () => {
     if (analysisConfig && (analysisConfig.mode === 'fix-lang' || analysisConfig.mode === 'fix-all') && analysisConfig.projectType === 'react') {
         // Find the root folder (where App.js is located)
         // Heuristic: Use the folder containing the App File as the "src" root
-        const appFile = uploadedFiles.find(f => f.name === analysisConfig.appFileName || f.path.endsWith(`/${analysisConfig.appFileName}`));
+        // Find the root folder (where App.js is located)
+        // Heuristic: Use the folder containing the App File as the "src" root
+        const configApp = analysisConfig.appFileName.trim().toLowerCase();
+        const normalize = (p) => p.replace(/\\/g, '/').toLowerCase();
+
+        const appFile = uploadedFiles.find(f => {
+             const fname = f.name.toLowerCase();
+             return fname === configApp || normalize(f.path).endsWith(`/${configApp}`);
+        });
+
         let srcPrefix = '';
         if (appFile) {
             // e.g. "my-project/src/App.js" -> "my-project/src/"
-            const parts = appFile.path.split('/');
+            const parts = appFile.path.replace(/\\/g, '/').split('/');
             parts.pop(); // remove filename
             srcPrefix = parts.join('/') + (parts.length > 0 ? '/' : '');
         }

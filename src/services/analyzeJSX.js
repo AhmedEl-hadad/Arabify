@@ -1,12 +1,12 @@
 import { parse } from '@babel/parser';
-import { injectProvider, injectToggle } from '../utils/reactInjector';
+import { injectProvider, injectToggle } from '../utils/reactInjector.js';
 import { 
     STRICT_PHYSICAL_PROPS, 
     AMBIGUOUS_PROPS, 
     STRICT_CSS_PROPS, 
     LOGICAL_PROPS, 
     RTL_MAPPINGS 
-} from './constants';
+} from './constants.js';
 
 /**
  * Analyzes JSX/React code for inline styles, semantic structure, and accessibility.
@@ -252,7 +252,7 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
     // Let's re-traverse or collect during the first pass.
     // To keep it simple and safe, let's collect findings in the main traversal and apply them here IF mode allows.
     
-    if (options.mode === 'fix' || options.mode === 'multi-lang') {
+    if (['fix', 'fix-css', 'fix-all', 'multi-lang'].includes(options.mode)) {
         const replacements = [];
         const fixVisitor = {
              ObjectExpression: (node, ancestors) => {
@@ -322,7 +322,7 @@ const analyzeJSX = (codeString, text, options = { mode: 'scan', isAppFile: false
     }
 
 
-    if (options.mode === 'multi-lang') {
+    if (['multi-lang', 'fix-lang', 'fix-all'].includes(options.mode)) {
         // 1. Inject Provider if it's the App File
         if (options.isAppFile) {
             modifiedCode = injectProvider(modifiedCode);
