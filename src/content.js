@@ -484,6 +484,22 @@ export const content = {
         videoUrl: "https://www.youtube.com/watch?v=wPvXHiHHSgY",
         videoTitle: "Everything you need to know about CSS Logical Properties",
       },
+      {
+        id: 8,
+        title: "8. Handling Variable Collisions",
+        desc: "What if you already use a variable named 'text' or 'data'? Our tool automatically aliases it, but you can also rename it manually.",
+        fix: "Destructure with a new name: const { text: myCustomName } = useContext(LanguageContext);",
+        code: `// If you have: const text = "My Local String";
+// The injector does this:
+const { text: arabifyContextvalue } = useContext(LanguageContext);
+
+// You can manually change it to:
+const { text: appText } = useContext(LanguageContext);
+// Now use {appText.welcome} in your JSX.`,
+        language: "javascript",
+        videoUrl: "",
+        videoTitle: "Documentation: Customizing Injection",
+      },
     ],
   },
 
@@ -967,6 +983,22 @@ export const content = {
         language: "css",
         videoUrl: "https://www.youtube.com/watch?v=wPvXHiHHSgY",
         videoTitle: "كل ما تحتاج إلى معرفته حول خصائص CSS المنطقية",
+      },
+      {
+        id: 8,
+        title: "8. التعامل مع تعارض المتغيرات",
+        desc: "ماذا لو كنت تستخدم بالفعل متغيراً باسم 'text' أو 'data'؟ أداتنا تقوم بتسميته تلقائياً، ولكن يمكنك تغيير الاسم يدوياً.",
+        fix: "استخدم التفكيك مع اسم جديد: const { text: myCustomName } = useContext(LanguageContext);",
+        code: `// إذا كان لديك: const text = "نص محلي";
+// ستقوم الأداة بحقن التالي:
+const { text: arabifyContextvalue } = useContext(LanguageContext);
+
+// يمكنك تغييره يدوياً إلى:
+const { text: appText } = useContext(LanguageContext);
+// الآن استخدم {appText.welcome} في الكود الخاص بك.`,
+        language: "javascript",
+        videoUrl: "",
+        videoTitle: "توثيق: تخصيص الحقن",
       },
     ],
   },
